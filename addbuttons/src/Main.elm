@@ -11,16 +11,13 @@ import Array exposing (..)
 type alias Model =
     { elements : Array Int }
 
-
 initialModel : Model
 initialModel =
     Model (fromList [])
 
-
 type Msg
     = Increment Int
     | Add
-
 
 update : Msg -> Model -> Model
 update msg model =
@@ -36,7 +33,6 @@ update msg model =
         Add ->
             { model | elements = push 0 model.elements }
 
-
 view : Model -> Html Msg
 view model =
     div []
@@ -44,14 +40,12 @@ view model =
         , button [ onClick Add ] [ text "Add" ]
         ]
 
-
 viewElement : Int -> Int -> Html Msg
 viewElement index element =
     div []
         [ text (String.fromInt element)
         , button [ onClick (Increment index) ] [ text "inc" ]
         ]
-
 
 main : Program () Model Msg
 main =
