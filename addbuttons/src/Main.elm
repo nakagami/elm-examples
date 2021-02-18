@@ -17,6 +17,7 @@ initialModel =
 
 type Msg
     = Increment Int
+    | Decrement Int
     | Add
 
 update : Msg -> Model -> Model
@@ -29,7 +30,13 @@ update msg model =
 
                 Nothing ->
                     model
+        Decrement index ->
+            case get index model.elements of
+                Just element ->
+                    { model | elements = set index (element - 1) model.elements }
 
+                Nothing ->
+                    model
         Add ->
             { model | elements = push 0 model.elements }
 
@@ -45,6 +52,7 @@ viewElement index element =
     div []
         [ text (String.fromInt element)
         , button [ onClick (Increment index) ] [ text "inc" ]
+        , button [ onClick (Decrement index) ] [ text "dec" ]
         ]
 
 main : Program () Model Msg
