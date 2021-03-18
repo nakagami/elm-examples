@@ -20,15 +20,11 @@ main =
 
 
 type VertPos
-    = Top
-    | Middle
-    | Bottom
+    = Int
 
 
 type HorizPos
-    = Left
-    | Center
-    | Right
+    = Int
 
 
 type alias Position =
@@ -77,12 +73,12 @@ type alias Model =
 
 rows : List VertPos
 rows =
-    [ Top, Middle, Bottom ]
+    List.range 0 8
 
 
 columns : List HorizPos
 columns =
-    [ Left, Center, Right ]
+    List.range 0 8
 
 
 allPositions : List Position
@@ -112,7 +108,7 @@ view model =
             [ caption [] [ text "TicTacToe" ]
             , tbody [] (htmlFrom model.board)
             , tr []
-                [ td [ colspan 3, align "center" ]
+                [ td [ colspan 8, align "center" ]
                     [ text <| stateStr model ]
                 ]
             ]
@@ -188,28 +184,12 @@ valToStr val =
 
 vPosToStr : VertPos -> String
 vPosToStr p =
-    case p of
-        Top ->
-            "Top"
-
-        Middle ->
-            "Middle"
-
-        Bottom ->
-            "Bottom"
+    "V" ++ String.fromInt p
 
 
 hPosToStr : HorizPos -> String
 hPosToStr p =
-    case p of
-        Left ->
-            "Left"
-
-        Center ->
-            "Center"
-
-        Right ->
-            "Right"
+    "H" ++ String.fromInt p
 
 
 playerToStr : Player -> String
