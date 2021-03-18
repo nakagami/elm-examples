@@ -281,10 +281,10 @@ updateState board =
         posWins =
             List.concat [ hLines, vLines, diagonals ]
     in
-    if List.any (\line -> isAllX line) posWins then
+    if List.any (\line -> isAllBlack line) posWins then
         Won PlayerBlack
 
-    else if List.any (\line -> isAllO line) posWins then
+    else if List.any (\line -> isAllWhite line) posWins then
         Won PlayerWhite
 
     else if List.any (\line -> hasEmpty line) posWins then
@@ -294,13 +294,13 @@ updateState board =
         Tie
 
 
-isAllX : List Cell -> Bool
-isAllX line =
+isAllBlack : List Cell -> Bool
+isAllBlack line =
     List.all (\c -> c.value == blackCell) line
 
 
-isAllO : List Cell -> Bool
-isAllO line =
+isAllWhite : List Cell -> Bool
+isAllWhite line =
     List.all (\c -> c.value == whiteCell) line
 
 
