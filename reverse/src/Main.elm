@@ -1,4 +1,4 @@
-module Main exposing (Board, Cell, GameState(..), Model, Player(..), Position, Value(..), allPositions, cellAttributes, cellTxt, columns, css, filterByCol, filterByRow, hPosToStr, htmlFrom, init, isAllO, isAllX, main, markForPlayer, playerToStr, rows, stateStr, update, updatePlayer, updateState, vPosToStr, valToStr, view)
+module Main exposing (..)
 
 import Browser
 import Html exposing (Attribute, Html, br, caption, div, table, tbody, td, text, thead, tr)
@@ -18,19 +18,19 @@ main =
 
 -- MODEL
 
+blackCell = 1
+whiteCell = -1
+emptyCell = 0
 
 type alias Position =
     ( Int, Int )
 
 
-type Value
-    = X
-    | O
-    | Empty
-
+type alias Value =
+    Int
 
 type alias Cell =
-    { position : Position, value : Value }
+    { position : Position, value : Int }
 
 
 type alias Row =
@@ -42,8 +42,8 @@ type alias Board =
 
 
 type Player
-    = PlayerX
-    | PlayerO
+    = PlayerBlack
+    | PlayerWhite
 
 
 type GameState
@@ -82,8 +82,8 @@ allPositions =
 
 init : Model
 init =
-    { board = List.map (\p -> Cell p Empty) allPositions
-    , currentPlayer = PlayerX
+    { board = List.map (\p -> Cell p emptyCell) allPositions
+    , currentPlayer = PlayerBlack
     , gameState = Active
     }
 
@@ -164,14 +164,12 @@ stateStr model =
 valToStr : Value -> String
 valToStr val =
     case val of
-        X ->
+        0 ->    -- emptyCell
+            " "
+        1 ->    -- blackCell
             "●"
-
-        O ->
+        _ ->    -- whiteCell(-1)
             "○"
-
-        Empty ->
-            "　"
 
 
 vPosToStr : Int -> String
@@ -187,10 +185,10 @@ hPosToStr p =
 playerToStr : Player -> String
 playerToStr p =
     case p of
-        PlayerX ->
+        PlayerBlack ->
             "Player ●"
 
-        PlayerO ->
+        PlayerWhite ->
             "Player ○"
 
 
@@ -232,7 +230,7 @@ update clkPos model =
             updateCell clkPos model
 
         clkPosIsEmpty =
-            model.board |> List.member { position = clkPos, value = Empty }
+            model.board |> List.member { position = clkPos, value = emptyCell }
     in
     if clkPosIsEmpty && model.gameState == Active then
         { model
@@ -284,10 +282,10 @@ updateState board =
             List.concat [ hLines, vLines, diagonals ]
     in
     if List.any (\line -> isAllX line) posWins then
-        Won PlayerX
+        Won PlayerBlack
 
     else if List.any (\line -> isAllO line) posWins then
-        Won PlayerO
+        Won PlayerWhite
 
     else if List.any (\line -> hasEmpty line) posWins then
         Active
@@ -298,34 +296,34 @@ updateState board =
 
 isAllX : List Cell -> Bool
 isAllX line =
-    List.all (\c -> c.value == X) line
+    List.all (\c -> c.value == blackCell) line
 
 
 isAllO : List Cell -> Bool
 isAllO line =
-    List.all (\c -> c.value == O) line
+    List.all (\c -> c.value == whiteCell) line
 
 
 hasEmpty : List Cell -> Bool
 hasEmpty line =
-    List.any (\c -> c.value == Empty) line
+    List.any (\c -> c.value == emptyCell) line
 
 
 markForPlayer : Player -> Value
 markForPlayer player =
     case player of
-        PlayerX ->
-            X
+        PlayerBlack ->
+            blackCell
 
-        PlayerO ->
-            O
+        PlayerWhite ->
+            whiteCell
 
 
 updatePlayer : Player -> Player
 updatePlayer player =
     case player of
-        PlayerX ->
-            PlayerO
+        PlayerBlack ->
+            PlayerWhite
 
-        PlayerO ->
-            PlayerX
+        PlayerWhite ->
+            PlayerBlack
