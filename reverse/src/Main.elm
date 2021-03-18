@@ -1,4 +1,4 @@
-module Main exposing (Board, Cell, GameState(..), HorizPos(..), Model, Player(..), Position, Value(..), VertPos(..), allPositions, cellAttributes, cellTxt, columns, css, filterByCol, filterByRow, hPosToStr, htmlFrom, init, isAllO, isAllX, main, markForPlayer, playerToStr, rows, stateStr, update, updatePlayer, updateState, vPosToStr, valToStr, view)
+module Main exposing (Board, Cell, GameState(..), Model, Player(..), Position, Value(..), allPositions, cellAttributes, cellTxt, columns, css, filterByCol, filterByRow, hPosToStr, htmlFrom, init, isAllO, isAllX, main, markForPlayer, playerToStr, rows, stateStr, update, updatePlayer, updateState, vPosToStr, valToStr, view)
 
 import Browser
 import Html exposing (Attribute, Html, br, caption, div, table, tbody, td, text, thead, tr)
@@ -19,16 +19,8 @@ main =
 -- MODEL
 
 
-type VertPos
-    = Int
-
-
-type HorizPos
-    = Int
-
-
 type alias Position =
-    ( VertPos, HorizPos )
+    ( Int, Int )
 
 
 type Value
@@ -71,14 +63,14 @@ type alias Model =
 -- INIT
 
 
-rows : List VertPos
+rows : List Int
 rows =
-    List.range 0 8
+    List.range 0 7
 
 
-columns : List HorizPos
+columns : List Int
 columns =
-    List.range 0 8
+    List.range 0 7
 
 
 allPositions : List Position
@@ -122,12 +114,12 @@ htmlFrom board =
         |> List.map makeRowHtml
 
 
-filterByRow : VertPos -> Board -> Row
+filterByRow : Int -> Board -> Row
 filterByRow pos board =
     List.filter (\cell -> Tuple.first cell.position == pos) board
 
 
-filterByCol : HorizPos -> Board -> Row
+filterByCol : Int -> Board -> Row
 filterByCol pos board =
     List.filter (\cell -> Tuple.second cell.position == pos) board
 
@@ -182,12 +174,12 @@ valToStr val =
             " - "
 
 
-vPosToStr : VertPos -> String
+vPosToStr : Int -> String
 vPosToStr p =
     "V" ++ String.fromInt p
 
 
-hPosToStr : HorizPos -> String
+hPosToStr : Int -> String
 hPosToStr p =
     "H" ++ String.fromInt p
 
@@ -242,6 +234,7 @@ update clkPos model =
         model
 
 
+-- TODO: reverse cells
 updateCell : Position -> Model -> Board
 updateCell clkPos model =
     List.map
@@ -268,10 +261,13 @@ updateState board =
             columns
                 |> List.map (\col -> filterByCol col board)
 
+--      TODO:
+--        diagonals =
+--            [ List.filter (\c -> c.position == ( Top, Right ) || c.position == ( Middle, Center ) || c.position == ( Bottom, Left )) board
+--            , List.filter (\c -> c.position == ( Bottom, Right ) || c.position == ( Middle, Center ) || c.position == ( Top, Left )) board
+--            ]
         diagonals =
-            [ List.filter (\c -> c.position == ( Top, Right ) || c.position == ( Middle, Center ) || c.position == ( Bottom, Left )) board
-            , List.filter (\c -> c.position == ( Bottom, Right ) || c.position == ( Middle, Center ) || c.position == ( Top, Left )) board
-            ]
+              []
 
         posWins =
             List.concat [ hLines, vLines, diagonals ]
