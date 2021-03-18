@@ -97,10 +97,10 @@ view model =
     div []
         [ Html.node "style" [] [ text css ]
         , table []
-            [ caption [] [ text "TicTacToe" ]
+            [ caption [] [ text "Reversi" ]
             , tbody [] (htmlFrom model.board)
             , tr []
-                [ td [ colspan 8, align "center" ]
+                [ td [ colspan 8 ]
                     [ text <| stateStr model ]
                 ]
             ]
@@ -165,13 +165,13 @@ valToStr : Value -> String
 valToStr val =
     case val of
         X ->
-            "X"
+            "●"
 
         O ->
-            "O"
+            "○"
 
         Empty ->
-            " - "
+            "　"
 
 
 vPosToStr : Int -> String
@@ -188,17 +188,28 @@ playerToStr : Player -> String
 playerToStr p =
     case p of
         PlayerX ->
-            "Player X"
+            "Player ●"
 
         PlayerO ->
-            "Player O"
+            "Player ○"
 
 
 css : String
 css =
     """
     table { border-spacing:0px; }
-    td { padding: 10px; text-align: center}
+    td {
+        border: 1px solid black;
+        width: 50px;
+        height: 50px;
+        background-color: green;
+        text-align: center;
+        vertical-align: middle;
+        table-layout: fixed;
+        padding: 1px 1px 1px 1px;
+        font-size: 33px;
+        text-align: center;
+    }
     .Center {
         border-left: .1em solid black;
         border-right: .1em solid black;
