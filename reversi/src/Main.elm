@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Attribute, Html, br, caption, div, table, tbody, td, text, thead, tr)
+import Html exposing (Attribute, Html, caption, div, table, tbody, tr, td, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Tuple
@@ -140,7 +140,7 @@ cellAttributes cell =
         ( v, h ) =
             cell.position
     in
-    [ onClick cell.position, class (vPosToStr v ++ " " ++ hPosToStr h) ]
+    [ onClick cell.position ]
 
 
 cellTxt : Cell -> List (Html Position)
@@ -170,16 +170,6 @@ valToStr val =
             "●"
         _ ->    -- whiteCell(-1)
             "○"
-
-
-vPosToStr : Int -> String
-vPosToStr p =
-    "V" ++ String.fromInt p
-
-
-hPosToStr : Int -> String
-hPosToStr p =
-    "H" ++ String.fromInt p
 
 
 playerToStr : Player -> String
@@ -270,7 +260,7 @@ updateState board =
             columns
                 |> List.map (\col -> filterByCol col board)
 
---      TODO:
+--      TODO: Check game over
 --        diagonals =
 --            [ List.filter (\c -> c.position == ( Top, Right ) || c.position == ( Middle, Center ) || c.position == ( Bottom, Left )) board
 --            , List.filter (\c -> c.position == ( Bottom, Right ) || c.position == ( Middle, Center ) || c.position == ( Top, Left )) board
