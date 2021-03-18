@@ -1,4 +1,6 @@
-module Main exposing (..)
+module Main exposing (main)
+
+-- https://github.com/nakagami/elm-examples/tree/master/reversi
 
 import Browser
 import Html exposing (Attribute, Html, caption, div, table, tbody, tr, td, text)
