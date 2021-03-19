@@ -3,7 +3,7 @@ module Main exposing (main)
 -- https://github.com/nakagami/elm-examples/tree/master/reversi
 
 import Browser
-import Html exposing (Attribute, Html, caption, div, table, tbody, tr, td, text)
+import Html exposing (Attribute, Html, caption, div, table, tbody, td, text, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Tuple
@@ -20,9 +20,18 @@ main =
 
 -- MODEL
 
-blackCell = 1
-whiteCell = -1
-emptyCell = 0
+
+blackCell =
+    1
+
+
+whiteCell =
+    -1
+
+
+emptyCell =
+    0
+
 
 type alias Position =
     ( Int, Int )
@@ -30,6 +39,7 @@ type alias Position =
 
 type alias Value =
     Int
+
 
 type alias Cell =
     { position : Position, value : Int }
@@ -166,11 +176,16 @@ stateStr model =
 valToStr : Value -> String
 valToStr val =
     case val of
-        0 ->    -- emptyCell
+        0 ->
+            -- emptyCell
             " "
-        1 ->    -- blackCell
+
+        1 ->
+            -- blackCell
             "●"
-        _ ->    -- whiteCell(-1)
+
+        _ ->
+            -- whiteCell(-1)
             "○"
 
 
@@ -235,7 +250,10 @@ update clkPos model =
         model
 
 
+
 -- TODO: reverse cells
+
+
 updateCell : Position -> Model -> Board
 updateCell clkPos model =
     List.map
@@ -262,13 +280,13 @@ updateState board =
             columns
                 |> List.map (\col -> filterByCol col board)
 
---      TODO: Check game over
---        diagonals =
---            [ List.filter (\c -> c.position == ( Top, Right ) || c.position == ( Middle, Center ) || c.position == ( Bottom, Left )) board
---            , List.filter (\c -> c.position == ( Bottom, Right ) || c.position == ( Middle, Center ) || c.position == ( Top, Left )) board
---            ]
+        --      TODO: Check game over
+        --        diagonals =
+        --            [ List.filter (\c -> c.position == ( Top, Right ) || c.position == ( Middle, Center ) || c.position == ( Bottom, Left )) board
+        --            , List.filter (\c -> c.position == ( Bottom, Right ) || c.position == ( Middle, Center ) || c.position == ( Top, Left )) board
+        --            ]
         diagonals =
-              []
+            []
 
         posWins =
             List.concat [ hLines, vLines, diagonals ]
