@@ -9,7 +9,6 @@ import Html.Events exposing (onClick)
 import Tuple
 import Array2D
 
-
 main =
     Browser.sandbox
         { init = init
@@ -18,41 +17,18 @@ main =
         }
 
 
-
 -- MODEL
 
+blackStone = 1
+whiteStone = -1
+emptyStone = 0
 
-blackCell =
-    1
+type alias Position = ( Int, Int )
+type alias Stone = Int
+type alias Cell = { position : Position, stone : Stone }
 
-
-whiteCell =
-    -1
-
-
-emptyCell =
-    0
-
-
-type alias Position =
-    ( Int, Int )
-
-
-type alias Value =
-    Int
-
-
-type alias Cell =
-    { position : Position, value : Int }
-
-
-type alias Row =
-    List Cell
-
-
-type alias Board =
-    List Cell
-
+type alias Row = List Cell
+type alias Board = List Cell
 
 type Player
     = PlayerBlack
@@ -72,9 +48,7 @@ type alias Model =
     }
 
 
-
 -- INIT
-
 
 rows : List Int
 rows =
@@ -95,7 +69,7 @@ allPositions =
 
 init : Model
 init =
-    { board = List.map (\p -> Cell p emptyCell) allPositions
+    { board = List.map (\p -> Cell p emptyStone) allPositions
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
@@ -158,7 +132,7 @@ cellAttributes cell =
 
 cellTxt : Cell -> List (Html Position)
 cellTxt cell =
-    [ text <| valToStr cell.value ]
+    [ text <| stoneToStr cell.stone ]
 
 
 stateStr : Model -> String
@@ -174,21 +148,18 @@ stateStr model =
             playerToStr winningPlayer ++ " wins !!"
 
 
-valToStr : Value -> String
-valToStr val =
-    case val of
+stoneToStr : Stone -> String
+stoneToStr stone =
+    case stone of
         0 ->
-            -- emptyCell
+            -- emptyStone
             " "
-
         1 ->
-            -- blackCell
+            -- blackStone
             "●"
-
         _ ->
-            -- whiteCell(-1)
+            -- whiteStone(-1)
             "○"
-
 
 playerToStr : Player -> String
 playerToStr p =
@@ -238,7 +209,7 @@ update clkPos model =
             updateCell clkPos model
 
         clkPosIsEmpty =
-            model.board |> List.member { position = clkPos, value = emptyCell }
+            model.board |> List.member { position = clkPos, stone = emptyStone }
     in
     if clkPosIsEmpty && model.gameState == Active then
         { model
@@ -253,15 +224,13 @@ update clkPos model =
 
 
 -- TODO: reverse cells
-
-
 updateCell : Position -> Model -> Board
 updateCell clkPos model =
     List.map
         (\cell ->
             if cell.position == clkPos then
                 { position = cell.position
-                , value = markForPlayer model.currentPlayer
+                , stone = markForPlayer model.currentPlayer
                 }
 
             else
@@ -307,27 +276,27 @@ updateState board =
 
 isAllBlack : List Cell -> Bool
 isAllBlack line =
-    List.all (\c -> c.value == blackCell) line
+    List.all (\c -> c.stone == blackStone) line
 
 
 isAllWhite : List Cell -> Bool
 isAllWhite line =
-    List.all (\c -> c.value == whiteCell) line
+    List.all (\c -> c.stone == whiteStone) line
 
 
 hasEmpty : List Cell -> Bool
 hasEmpty line =
-    List.any (\c -> c.value == emptyCell) line
+    List.any (\c -> c.stone == emptyStone) line
 
 
-markForPlayer : Player -> Value
+markForPlayer : Player -> Stone
 markForPlayer player =
     case player of
         PlayerBlack ->
-            blackCell
+            blackStone
 
         PlayerWhite ->
-            whiteCell
+            whiteStone
 
 
 updatePlayer : Player -> Player
