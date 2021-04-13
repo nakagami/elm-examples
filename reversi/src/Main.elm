@@ -7,6 +7,7 @@ import Html exposing (Attribute, Html, caption, div, table, tbody, td, text, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Tuple
+import Array2D
 
 
 main =
