@@ -85,7 +85,7 @@ view model =
 
 htmlFrom : Board -> List (Html Position)
 htmlFrom board =
-    rows
+    List.range 0 7
         |> List.map (\r -> filterByRow r board)
         |> List.map makeRowHtml
 
