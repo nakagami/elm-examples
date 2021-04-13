@@ -18,7 +18,6 @@ main =
 
 
 -- MODEL
-
 blackStone = 1
 whiteStone = -1
 emptyStone = 0
@@ -34,12 +33,10 @@ type Player
     = PlayerBlack
     | PlayerWhite
 
-
 type GameState
     = Active
     | Tie
     | Won Player
-
 
 type alias Model =
     { board : Board
@@ -49,23 +46,19 @@ type alias Model =
 
 
 -- INIT
-
 rows : List Int
 rows =
     List.range 0 7
 
-
 columns : List Int
 columns =
     List.range 0 7
-
 
 allPositions : List Position
 allPositions =
     columns
         |> List.map (\r -> List.map (\c -> ( c, r )) rows)
         |> List.concat
-
 
 init : Model
 init =
@@ -75,10 +68,7 @@ init =
     }
 
 
-
 -- VIEW
-
-
 view : Model -> Html Position
 view model =
     div []
@@ -93,23 +83,19 @@ view model =
             ]
         ]
 
-
 htmlFrom : Board -> List (Html Position)
 htmlFrom board =
     rows
         |> List.map (\r -> filterByRow r board)
         |> List.map makeRowHtml
 
-
 filterByRow : Int -> Board -> Row
 filterByRow pos board =
     List.filter (\cell -> Tuple.first cell.position == pos) board
 
-
 filterByCol : Int -> Board -> Row
 filterByCol pos board =
     List.filter (\cell -> Tuple.second cell.position == pos) board
-
 
 makeRowHtml : Row -> Html Position
 makeRowHtml row =
@@ -198,10 +184,7 @@ css =
     """
 
 
-
 -- UPDATE
-
-
 update : Position -> Model -> Model
 update clkPos model =
     let
@@ -221,8 +204,6 @@ update clkPos model =
     else
         model
 
-
-
 -- TODO: reverse cells
 updateCell : Position -> Model -> Board
 updateCell clkPos model =
@@ -238,56 +219,13 @@ updateCell clkPos model =
         )
         model.board
 
-
 updateState : Board -> GameState
 updateState board =
     let
-        hLines =
-            rows
-                |> List.map (\row -> filterByRow row board)
-
-        vLines =
-            columns
-                |> List.map (\col -> filterByCol col board)
-
-        --      TODO: Check game over
-        --        diagonals =
-        --            [ List.filter (\c -> c.position == ( Top, Right ) || c.position == ( Middle, Center ) || c.position == ( Bottom, Left )) board
-        --            , List.filter (\c -> c.position == ( Bottom, Right ) || c.position == ( Middle, Center ) || c.position == ( Top, Left )) board
-        --            ]
-        diagonals =
-            []
-
-        posWins =
-            List.concat [ hLines, vLines, diagonals ]
+        -- TODO: Game over?
+        posWins = []
     in
-    if List.any (\line -> isAllBlack line) posWins then
-        Won PlayerBlack
-
-    else if List.any (\line -> isAllWhite line) posWins then
-        Won PlayerWhite
-
-    else if List.any (\line -> hasEmpty line) posWins then
         Active
-
-    else
-        Tie
-
-
-isAllBlack : List Cell -> Bool
-isAllBlack line =
-    List.all (\c -> c.stone == blackStone) line
-
-
-isAllWhite : List Cell -> Bool
-isAllWhite line =
-    List.all (\c -> c.stone == whiteStone) line
-
-
-hasEmpty : List Cell -> Bool
-hasEmpty line =
-    List.any (\c -> c.stone == emptyStone) line
-
 
 markForPlayer : Player -> Stone
 markForPlayer player =
@@ -297,7 +235,6 @@ markForPlayer player =
 
         PlayerWhite ->
             whiteStone
-
 
 updatePlayer : Player -> Player
 updatePlayer player =
