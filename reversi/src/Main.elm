@@ -18,10 +18,6 @@ main =
 
 
 -- MODEL
-blackStone = 1
-whiteStone = -1
-emptyStone = 0
-
 type alias Position = ( Int, Int )
 type alias Stone = Int
 type alias Cell = { position : Position, stone : Stone }
@@ -46,23 +42,15 @@ type alias Model =
 
 
 -- INIT
-rows : List Int
-rows =
-    List.range 0 7
-
-columns : List Int
-columns =
-    List.range 0 7
-
 allPositions : List Position
 allPositions =
-    columns
-        |> List.map (\r -> List.map (\c -> ( c, r )) rows)
+    List.range 0 7
+        |> List.map (\r -> List.map (\c -> ( c, r )) (List.range 0 7))
         |> List.concat
 
 init : Model
 init =
-    { board = List.map (\p -> Cell p emptyStone) allPositions
+    { board = List.map (\p -> Cell p 0) allPositions
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
@@ -138,13 +126,10 @@ stoneToStr : Stone -> String
 stoneToStr stone =
     case stone of
         0 ->
-            -- emptyStone
             " "
         1 ->
-            -- blackStone
             "●"
         _ ->
-            -- whiteStone(-1)
             "○"
 
 playerToStr : Player -> String
@@ -192,7 +177,7 @@ update clkPos model =
             updateCell clkPos model
 
         clkPosIsEmpty =
-            model.board |> List.member { position = clkPos, stone = emptyStone }
+            model.board |> List.member { position = clkPos, stone = 0 }
     in
     if clkPosIsEmpty && model.gameState == Active then
         { model
@@ -230,11 +215,8 @@ updateState board =
 markForPlayer : Player -> Stone
 markForPlayer player =
     case player of
-        PlayerBlack ->
-            blackStone
-
-        PlayerWhite ->
-            whiteStone
+        PlayerBlack -> 1
+        PlayerWhite -> -1
 
 updatePlayer : Player -> Player
 updatePlayer player =
