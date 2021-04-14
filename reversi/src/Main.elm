@@ -7,6 +7,7 @@ import Html exposing (Attribute, Html, caption, div, table, tbody, td, text, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Tuple
+import Array
 import Array2D
 
 main =
@@ -20,10 +21,10 @@ main =
 -- MODEL
 type alias Position = ( Int, Int )
 type alias Disk = Int
-type alias Cell = { position : Position, stone : Disk }
+type alias Cell = { position : Position, disk : Disk }
 
-type alias Row = List Cell
-type alias Board = List Cell
+type alias Row = Maybe (Array.Array Cell)
+type alias Board = Array2D.Array2D Cell
 
 type Player
     = PlayerBlack
@@ -42,15 +43,9 @@ type alias Model =
 
 
 -- INIT
-allPositions : List Position
-allPositions =
-    List.range 0 7
-        |> List.map (\r -> List.map (\c -> ( c, r )) (List.range 0 7))
-        |> List.concat
-
 init : Model
 init =
-    { board = List.map (\p -> Cell p 0) allPositions
+    { board = Array2D.indexedMap (\r c v -> Cell(r, c) v) (Array2D.repeat 8 8 0)
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
@@ -79,16 +74,15 @@ htmlFrom board =
 
 filterByRow : Int -> Board -> Row
 filterByRow pos board =
-    List.filter (\cell -> Tuple.first cell.position == pos) board
-
-filterByCol : Int -> Board -> Row
-filterByCol pos board =
-    List.filter (\cell -> Tuple.second cell.position == pos) board
+    Array2D.getRow pos board
 
 makeRowHtml : Row -> Html Position
 makeRowHtml row =
-    tr [] (List.map makeCellHtml row)
-
+    case row of
+        Just rowArray ->
+            tr [] (List.map makeCellHtml (Array.toList rowArray))
+        Nothing ->
+            tr [] []
 
 makeCellHtml : Cell -> Html Position
 makeCellHtml cell =
@@ -97,16 +91,12 @@ makeCellHtml cell =
 
 cellAttributes : Cell -> List (Attribute Position)
 cellAttributes cell =
-    let
-        ( v, h ) =
-            cell.position
-    in
     [ onClick cell.position ]
 
 
 cellTxt : Cell -> List (Html Position)
 cellTxt cell =
-    [ text <| stoneToStr cell.stone ]
+    [ text <| diskToStr cell.disk ]
 
 
 stateStr : Model -> String
@@ -122,9 +112,9 @@ stateStr model =
             playerToStr winningPlayer ++ " wins !!"
 
 
-stoneToStr : Disk -> String
-stoneToStr stone =
-    case stone of
+diskToStr : Disk -> String
+diskToStr disk =
+    case disk of
         0 ->
             " "
         1 ->
@@ -137,10 +127,16 @@ playerToStr p =
     case p of
         PlayerBlack ->
             "Player ●"
-
         PlayerWhite ->
             "Player ○"
 
+playerToDisk : Player -> Disk
+playerToDisk p =
+    case p of
+        PlayerBlack ->
+            1
+        PlayerWhite ->
+            -1
 
 css : String
 css =
@@ -175,34 +171,33 @@ update clkPos model =
     let
         updatedBoard =
             updateCell clkPos model
-
-        clkPosIsEmpty =
-            model.board |> List.member { position = clkPos, stone = 0 }
     in
-    if clkPosIsEmpty && model.gameState == Active then
+    if (canPlace clkPos model.board)  && model.gameState == Active then
         { model
             | board = updatedBoard
             , currentPlayer = updatePlayer model.currentPlayer
             , gameState = updateState updatedBoard
         }
-
     else
         model
 
+-- TODO: check other condistions
+canPlace : Position -> Board -> Bool
+canPlace pos board =
+    case Array2D.get (Tuple.first pos) (Tuple.second pos) board of
+        Just cell ->
+            cell.disk == 0
+        Nothing ->
+            False
+
 -- TODO: reverse cells
 updateCell : Position -> Model -> Board
-updateCell clkPos model =
-    List.map
-        (\cell ->
-            if cell.position == clkPos then
-                { position = cell.position
-                , stone = markForPlayer model.currentPlayer
-                }
-
-            else
-                cell
-        )
-        model.board
+updateCell pos model =
+    case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
+        Just cell ->
+            Array2D.set (Tuple.first pos) (Tuple.second pos) (Cell pos (playerToDisk model.currentPlayer)) model.board
+        Nothing ->
+            model.board
 
 updateState : Board -> GameState
 updateState board =
