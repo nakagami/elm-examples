@@ -21,9 +21,9 @@ main =
 -- MODEL
 type alias Position = ( Int, Int )
 type alias Disk = Int
-type alias Cell = { position : Position, disk : Disk }
+type alias PosDisk = { position : Position, disk : Disk }
 
-type alias Row = Maybe (Array.Array Cell)
+type alias Row = Maybe (Array.Array PosDisk)
 type alias Board = Array2D.Array2D Disk
 
 type Player
@@ -87,7 +87,7 @@ htmlFrom board =
 
 filterByRow : Int -> Board -> Row
 filterByRow pos board =
-    Array2D.getRow pos (Array2D.indexedMap (\r c v -> Cell(r, c) v) board)
+    Array2D.getRow pos (Array2D.indexedMap (\r c v -> PosDisk(r, c) v) board)
 
 makeRowHtml : Row -> Html Position
 makeRowHtml row =
@@ -97,17 +97,17 @@ makeRowHtml row =
         Nothing ->
             tr [] []
 
-makeCellHtml : Cell -> Html Position
+makeCellHtml : PosDisk -> Html Position
 makeCellHtml cell =
     td (cellAttributes cell) (cellTxt cell)
 
 
-cellAttributes : Cell -> List (Attribute Position)
+cellAttributes : PosDisk -> List (Attribute Position)
 cellAttributes cell =
     [ onClick cell.position ]
 
 
-cellTxt : Cell -> List (Html Position)
+cellTxt : PosDisk -> List (Html Position)
 cellTxt cell =
     [ text <| diskToStr cell.disk ]
 
