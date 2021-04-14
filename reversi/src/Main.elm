@@ -19,6 +19,8 @@ main =
 
 
 -- MODEL
+blackDisk = -1
+whiteDisk = 1
 type alias Position = ( Int, Int )
 type alias Disk = Int
 type alias PosDisk = { position : Position, disk : Disk }
@@ -57,8 +59,8 @@ initBoard = [
     [0, 0, 0, 0, 0, 0, 0, 0]
     , [0, 0, 0, 0, 0, 0, 0, 0]
     , [0, 0, 0, 0, 0, 0, 0, 0]
-    , [0, 0, 0, -1, 1, 0, 0, 0]
-    , [0, 0, 0, 1, -1, 0, 0, 0]
+    , [0, 0, 0, whiteDisk, blackDisk, 0, 0, 0]
+    , [0, 0, 0, blackDisk, whiteDisk, 0, 0, 0]
     , [0, 0, 0, 0, 0, 0, 0, 0]
     , [0, 0, 0, 0, 0, 0, 0, 0]
     , [0, 0, 0, 0, 0, 0, 0, 0]]
@@ -130,10 +132,10 @@ diskToStr disk =
     case disk of
         0 ->
             " "
-        1 ->
-            "●"
-        _ ->
+        1 ->        -- whiteDisk
             "○"
+        _ ->
+            "●"
 
 playerToStr : Player -> String
 playerToStr p =
@@ -147,9 +149,9 @@ playerToDisk : Player -> Disk
 playerToDisk p =
     case p of
         PlayerBlack ->
-            1
+            -1  -- blackDisk
         PlayerWhite ->
-            -1
+            1   -- whiteDisk
 
 css : String
 css =
@@ -223,8 +225,8 @@ updateState board =
 markForPlayer : Player -> Disk
 markForPlayer player =
     case player of
-        PlayerBlack -> 1
-        PlayerWhite -> -1
+        PlayerBlack -> whiteDisk
+        PlayerWhite -> blackDisk
 
 updatePlayer : Player -> Player
 updatePlayer player =
