@@ -45,10 +45,20 @@ type alias Model =
 -- INIT
 init : Model
 init =
-    { board = Array2D.indexedMap (\r c v -> Cell(r, c) v) (Array2D.repeat 8 8 0)
+    { board = Array2D.indexedMap (\r c v -> Cell(r, c) v) (Array2D.fromList initBoard)
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
+
+initBoard = [
+    [0, 0, 0, 0, 0, 0, 0, 0]
+    , [0, 0, 0, 0, 0, 0, 0, 0]
+    , [0, 0, 0, 0, 0, 0, 0, 0]
+    , [0, 0, 0, -1, 1, 0, 0, 0]
+    , [0, 0, 0, 1, -1, 0, 0, 0]
+    , [0, 0, 0, 0, 0, 0, 0, 0]
+    , [0, 0, 0, 0, 0, 0, 0, 0]
+    , [0, 0, 0, 0, 0, 0, 0, 0]]
 
 
 -- VIEW
