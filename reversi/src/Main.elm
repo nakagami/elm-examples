@@ -19,8 +19,8 @@ main =
 
 -- MODEL
 type alias Position = ( Int, Int )
-type alias Stone = Int
-type alias Cell = { position : Position, stone : Stone }
+type alias Disk = Int
+type alias Cell = { position : Position, stone : Disk }
 
 type alias Row = List Cell
 type alias Board = List Cell
@@ -122,7 +122,7 @@ stateStr model =
             playerToStr winningPlayer ++ " wins !!"
 
 
-stoneToStr : Stone -> String
+stoneToStr : Disk -> String
 stoneToStr stone =
     case stone of
         0 ->
@@ -212,7 +212,7 @@ updateState board =
     in
         Active
 
-markForPlayer : Player -> Stone
+markForPlayer : Player -> Disk
 markForPlayer player =
     case player of
         PlayerBlack -> 1
