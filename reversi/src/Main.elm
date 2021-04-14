@@ -24,7 +24,7 @@ type alias Disk = Int
 type alias Cell = { position : Position, disk : Disk }
 
 type alias Row = Maybe (Array.Array Cell)
-type alias Board = Array2D.Array2D Cell
+type alias Board = Array2D.Array2D Disk
 
 type Player
     = PlayerBlack
@@ -48,7 +48,7 @@ type alias Msg =
 -- INIT
 init : Model
 init =
-    { board = Array2D.indexedMap (\r c v -> Cell(r, c) v) (Array2D.fromList initBoard)
+    { board = Array2D.fromList initBoard
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
@@ -87,7 +87,7 @@ htmlFrom board =
 
 filterByRow : Int -> Board -> Row
 filterByRow pos board =
-    Array2D.getRow pos board
+    Array2D.getRow pos (Array2D.indexedMap (\r c v -> Cell(r, c) v) board)
 
 makeRowHtml : Row -> Html Position
 makeRowHtml row =
@@ -198,8 +198,8 @@ update clkPos model =
 canPlace : Position -> Board -> Bool
 canPlace pos board =
     case Array2D.get (Tuple.first pos) (Tuple.second pos) board of
-        Just cell ->
-            cell.disk == 0
+        Just disk ->
+            disk == 0
         Nothing ->
             False
 
@@ -207,8 +207,8 @@ canPlace pos board =
 updateCell : Position -> Model -> Board
 updateCell pos model =
     case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
-        Just cell ->
-            Array2D.set (Tuple.first pos) (Tuple.second pos) (Cell pos (playerToDisk model.currentPlayer)) model.board
+        Just disk ->
+            Array2D.set (Tuple.first pos) (Tuple.second pos) (playerToDisk model.currentPlayer) model.board
         Nothing ->
             model.board
 
