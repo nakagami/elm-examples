@@ -41,6 +41,9 @@ type alias Model =
     , gameState : GameState
     }
 
+type alias Msg =
+    Position
+
 
 -- INIT
 init : Model
@@ -62,7 +65,7 @@ initBoard = [
 
 
 -- VIEW
-view : Model -> Html Position
+view : Model -> Html Msg
 view model =
     div []
         [ Html.node "style" [] [ text css ]
