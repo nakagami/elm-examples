@@ -237,7 +237,7 @@ update clkPos model =
         updatedBoard =
             updateCell clkPos model
     in
-    if canPlace clkPos model.board && model.gameState == Active then
+    if canPlace clkPos model && model.gameState == Active then
         { model
             | board = updatedBoard
             , currentPlayer = updatePlayer model.currentPlayer
@@ -249,12 +249,43 @@ update clkPos model =
 
 
 
+-- There is my disk in the direction of (deltaX, deltaY) from pos
+
+
+hasMyDisk : Model -> Position -> ( Int, Int ) -> Bool
+hasMyDisk model pos ( deltaX, deltaY ) =
+    let
+        nextX =
+            Tuple.first pos + deltaX
+
+        nextY =
+            Tuple.second pos + deltaY
+    in
+    case Array2D.get nextX nextY model.board of
+        Just disk ->
+            if disk == 0 then
+                False
+
+            else if disk == playerToDisk model.currentPlayer then
+                True
+
+            else
+                hasMyDisk model ( nextX, nextY ) ( deltaX, deltaY )
+
+        Nothing ->
+            False
+
+canPlaceDirection: Model -> Position -> (Int, Int) -> Bool
+canPlaceDirection model pos (deltaX, deltaY) =
+    True
+
+
 -- TODO: check other condistions
 
 
-canPlace : Position -> Board -> Bool
-canPlace pos board =
-    case Array2D.get (Tuple.first pos) (Tuple.second pos) board of
+canPlace : Position -> Model -> Bool
+canPlace pos model =
+    case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
         Just disk ->
             disk == 0
 
