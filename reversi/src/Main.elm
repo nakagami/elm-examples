@@ -2,13 +2,14 @@ module Main exposing (main)
 
 -- https://github.com/nakagami/elm-examples/tree/master/reversi
 
+import Array
+import Array2D
 import Browser
 import Html exposing (Attribute, Html, caption, div, table, tbody, td, text, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Tuple
-import Array
-import Array2D
+
 
 main =
     Browser.sandbox
@@ -18,24 +19,48 @@ main =
         }
 
 
--- MODEL
-blackDisk = -1
-whiteDisk = 1
-type alias Position = ( Int, Int )
-type alias Disk = Int
-type alias PosDisk = { position : Position, disk : Disk }
 
-type alias Row = Maybe (Array.Array PosDisk)
-type alias Board = Array2D.Array2D Disk
+-- MODEL
+
+
+blackDisk =
+    -1
+
+
+whiteDisk =
+    1
+
+
+type alias Position =
+    ( Int, Int )
+
+
+type alias Disk =
+    Int
+
+
+type alias PosDisk =
+    { position : Position, disk : Disk }
+
+
+type alias Row =
+    Maybe (Array.Array PosDisk)
+
+
+type alias Board =
+    Array2D.Array2D Disk
+
 
 type Player
     = PlayerBlack
     | PlayerWhite
 
+
 type GameState
     = Active
     | Tie
     | Won Player
+
 
 type alias Model =
     { board : Board
@@ -43,11 +68,15 @@ type alias Model =
     , gameState : GameState
     }
 
+
 type alias Msg =
     Position
 
 
+
 -- INIT
+
+
 init : Model
 init =
     { board = Array2D.fromList initBoard
@@ -55,18 +84,23 @@ init =
     , gameState = Active
     }
 
-initBoard = [
-    [0, 0, 0, 0, 0, 0, 0, 0]
-    , [0, 0, 0, 0, 0, 0, 0, 0]
-    , [0, 0, 0, 0, 0, 0, 0, 0]
-    , [0, 0, 0, whiteDisk, blackDisk, 0, 0, 0]
-    , [0, 0, 0, blackDisk, whiteDisk, 0, 0, 0]
-    , [0, 0, 0, 0, 0, 0, 0, 0]
-    , [0, 0, 0, 0, 0, 0, 0, 0]
-    , [0, 0, 0, 0, 0, 0, 0, 0]]
+
+initBoard =
+    [ [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, whiteDisk, blackDisk, 0, 0, 0 ]
+    , [ 0, 0, 0, blackDisk, whiteDisk, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    ]
+
 
 
 -- VIEW
+
+
 view : Model -> Html Msg
 view model =
     div []
@@ -81,23 +115,28 @@ view model =
             ]
         ]
 
+
 htmlFrom : Board -> List (Html Position)
 htmlFrom board =
     List.range 0 7
         |> List.map (\r -> filterByRow r board)
         |> List.map makeRowHtml
 
+
 filterByRow : Int -> Board -> Row
 filterByRow pos board =
-    Array2D.getRow pos (Array2D.indexedMap (\r c v -> PosDisk(r, c) v) board)
+    Array2D.getRow pos (Array2D.indexedMap (\r c v -> PosDisk ( r, c ) v) board)
+
 
 makeRowHtml : Row -> Html Position
 makeRowHtml row =
     case row of
         Just rowArray ->
             tr [] (List.map makeCellHtml (Array.toList rowArray))
+
         Nothing ->
             tr [] []
+
 
 makeCellHtml : PosDisk -> Html Position
 makeCellHtml cell =
@@ -132,26 +171,39 @@ diskToStr disk =
     case disk of
         0 ->
             " "
-        1 ->        -- whiteDisk
+
+        1 ->
+            -- whiteDisk
             "○"
+
         _ ->
             "●"
+
 
 playerToStr : Player -> String
 playerToStr p =
     case p of
         PlayerBlack ->
             "Player ●"
+
         PlayerWhite ->
             "Player ○"
+
 
 playerToDisk : Player -> Disk
 playerToDisk p =
     case p of
         PlayerBlack ->
-            -1  -- blackDisk
+            -1
+
+        -- blackDisk
         PlayerWhite ->
-            1   -- whiteDisk
+            1
+
+
+
+-- whiteDisk
+
 
 css : String
 css =
@@ -180,53 +232,74 @@ css =
     """
 
 
+
 -- UPDATE
+
+
 update : Position -> Model -> Model
 update clkPos model =
     let
         updatedBoard =
             updateCell clkPos model
     in
-    if (canPlace clkPos model.board)  && model.gameState == Active then
+    if canPlace clkPos model.board && model.gameState == Active then
         { model
             | board = updatedBoard
             , currentPlayer = updatePlayer model.currentPlayer
             , gameState = updateState updatedBoard
         }
+
     else
         model
 
+
+
 -- TODO: check other condistions
+
+
 canPlace : Position -> Board -> Bool
 canPlace pos board =
     case Array2D.get (Tuple.first pos) (Tuple.second pos) board of
         Just disk ->
             disk == 0
+
         Nothing ->
             False
 
+
+
 -- TODO: reverse cells
+
+
 updateCell : Position -> Model -> Board
 updateCell pos model =
     case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
         Just disk ->
             Array2D.set (Tuple.first pos) (Tuple.second pos) (playerToDisk model.currentPlayer) model.board
+
         Nothing ->
             model.board
+
 
 updateState : Board -> GameState
 updateState board =
     let
         -- TODO: Game over?
-        posWins = []
+        posWins =
+            []
     in
-        Active
+    Active
+
 
 markForPlayer : Player -> Disk
 markForPlayer player =
     case player of
-        PlayerBlack -> whiteDisk
-        PlayerWhite -> blackDisk
+        PlayerBlack ->
+            whiteDisk
+
+        PlayerWhite ->
+            blackDisk
+
 
 updatePlayer : Player -> Player
 updatePlayer player =
