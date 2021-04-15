@@ -324,29 +324,50 @@ canPlace model pos =
 
 -- reverse disks
 
-
-reverseDiskDirection : Disk -> Position -> ( Int, Int ) Board -> Board
-reverseDiskDirection myDisk pos ( deltaX, deltaY ) board =
+reverseDiskDirection : Board -> Disk -> Position -> (Int, Int ) -> Board
+reverseDiskDirection board myDisk pos (deltaX, deltaY) =
     let
         nextX =
             Tuple.first pos + deltaX
 
         nextY =
             Tuple.second pos + deltaY
-    in
-    case Array2D.get nextX nextY board of
-        Just disk ->
-            if myDisk == disk * -1 then
-                reverseDiskDirection myDisk (nextX, nextY) board (deltaX, deltaY)
-            else
-                board
 
-        Nothing ->
+        updatedBoard = Array2D.set nextX nextY myDisk board
+        canReverse = case Array2D.get nextX nextY board of
+                Just disk ->
+                    disk == myDisk * -1
+
+                Nothing ->
+                    False
+
+    in
+        if canReverse then
+            reverseDiskDirection updatedBoard pos (deltaX, deltaY)
+        else
             board
+
+
+reverseDiskDirections : Board -> Disk -> Position -> List ( Int, Int ) -> Board
+reverseDiskDirections board myDisk pos directions =
+    let
+        updatedBoard = case List.head directions of
+            Just delta ->
+                reverseDiskDirection board myDisk pos delta
+                
+            Nothing ->
+                board
+    in
+        case List.tail directions of
+            Just restDirections ->
+                reverseDiskDirections board myDisk pos restDirections
+            Nothing ->
+                updatedBoard
+                
 
 reverseDisk: Board -> Disk -> Position -> Board
 reverseDisk board myDisk pos =
-    List.foldl (reverseDiskDirection board myDisk pos) allDirections
+    reverseDiskDirections board myDisk pos allDirections
 
 
 updateCell : Position -> Model -> Board
