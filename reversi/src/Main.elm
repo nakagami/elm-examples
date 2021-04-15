@@ -303,12 +303,19 @@ canPlaceDirection model pos ( deltaX, deltaY ) =
 
 canPlace : Model -> Position -> Bool
 canPlace model pos =
-    case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
-        Just disk ->
-            disk == 0
+    let
+        isEmpty =
+            case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
+                Just disk ->
+                    disk == 0
 
-        Nothing ->
-            False
+                Nothing ->
+                    False
+    in
+    if isEmpty then
+        True
+    else
+        False
 
 
 
