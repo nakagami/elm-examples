@@ -369,15 +369,6 @@ updateState board =
     Active
 
 
-markForPlayer : Player -> Disk
-markForPlayer player =
-    case player of
-        PlayerBlack ->
-            1
-
-        PlayerWhite ->
-            -1
-
 
 updatePlayer : Player -> Player
 updatePlayer player =
