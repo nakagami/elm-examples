@@ -314,10 +314,12 @@ canPlace model pos =
     in
     if isEmpty then
         List.any
-            (\r -> r==True)
+            (\r -> r == True)
             (List.map
                 (canPlaceDirection model pos)
-                [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ])
+                [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ]
+            )
+
     else
         False
 
