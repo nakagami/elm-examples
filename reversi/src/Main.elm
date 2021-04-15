@@ -27,7 +27,10 @@ type alias Position =
     ( Int, Int )
 
 
+
 -- black: -1 white: 1 empty: 0
+
+
 type alias Disk =
     Int
 
