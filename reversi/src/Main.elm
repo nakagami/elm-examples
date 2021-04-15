@@ -92,6 +92,7 @@ initBoard =
     , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     ]
 
+allDirections = [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ]
 
 
 -- VIEW
@@ -315,15 +316,37 @@ canPlace model pos =
     if isEmpty then
         List.any
             (\r -> r==True)
-            (List.map
-                (canPlaceDirection model pos)
-                [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ])
+            (List.map (canPlaceDirection model pos) allDirections)
     else
         False
 
 
 
--- TODO: reverse cells
+-- reverse disks
+
+
+reverseDiskDirection : Disk -> Position -> ( Int, Int ) Board -> Board
+reverseDiskDirection myDisk pos ( deltaX, deltaY ) board =
+    let
+        nextX =
+            Tuple.first pos + deltaX
+
+        nextY =
+            Tuple.second pos + deltaY
+    in
+    case Array2D.get nextX nextY board of
+        Just disk ->
+            if myDisk == disk * -1 then
+                reverseDiskDirection myDisk (nextX, nextY) board (deltaX, deltaY)
+            else
+                board
+
+        Nothing ->
+            board
+
+reverseDisk: Board -> Disk -> Position -> Board
+reverseDisk board myDisk pos =
+    List.foldl (reverseDiskDirection board myDisk pos) allDirections
 
 
 updateCell : Position -> Model -> Board
