@@ -23,14 +23,6 @@ main =
 -- MODEL
 
 
-blackDisk =
-    -1
-
-
-whiteDisk =
-    1
-
-
 type alias Position =
     ( Int, Int )
 
@@ -89,8 +81,8 @@ initBoard =
     [ [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    , [ 0, 0, 0, whiteDisk, blackDisk, 0, 0, 0 ]
-    , [ 0, 0, 0, blackDisk, whiteDisk, 0, 0, 0 ]
+    , [ 0, 0, 0, 1, -1, 0, 0, 0 ]
+    , [ 0, 0, 0, -1, 1, 0, 0, 0 ]
     , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
     , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
@@ -196,7 +188,6 @@ playerToDisk p =
         PlayerBlack ->
             -1
 
-        -- blackDisk
         PlayerWhite ->
             1
 
@@ -295,10 +286,10 @@ markForPlayer : Player -> Disk
 markForPlayer player =
     case player of
         PlayerBlack ->
-            whiteDisk
+            1
 
         PlayerWhite ->
-            blackDisk
+            -1
 
 
 updatePlayer : Player -> Player
