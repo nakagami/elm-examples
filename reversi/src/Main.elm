@@ -93,6 +93,10 @@ initBoard =
     ]
 
 
+allDirections =
+    [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ]
+
+
 
 -- VIEW
 
@@ -316,7 +320,7 @@ canPlace model pos =
         List.length
             (List.filter
                 (canPlaceDirection model pos)
-                [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ]
+                allDirections
             )
             > 0
 
@@ -325,17 +329,86 @@ canPlace model pos =
 
 
 
--- TODO: reverse cells
+-- reverse disks
+
+
+reverseDiskDirection : Board -> Disk -> Position -> ( Int, Int ) -> Board
+reverseDiskDirection board myDisk pos ( deltaX, deltaY ) =
+    let
+        nextX =
+            Tuple.first pos + deltaX
+
+        nextY =
+            Tuple.second pos + deltaY
+
+        canReverse =
+            case Array2D.get nextX nextY board of
+                Just disk ->
+                    disk == myDisk * -1
+
+                Nothing ->
+                    False
+    in
+    if canReverse then
+        reverseDiskDirection
+            (Array2D.set nextX nextY myDisk board)
+            myDisk
+            ( nextX, nextY )
+            ( deltaX, deltaY )
+
+    else
+        board
+
+
+reverseDiskDirections : Board -> Disk -> Position -> List ( Int, Int ) -> Board
+reverseDiskDirections board myDisk pos directions =
+    let
+        updatedBoard =
+            case List.head directions of
+                Just delta ->
+                    reverseDiskDirection board myDisk pos delta
+
+                Nothing ->
+                    board
+    in
+    case List.tail directions of
+        Just restDirections ->
+            reverseDiskDirections board myDisk pos restDirections
+
+        Nothing ->
+            updatedBoard
+
+
+reverseDisk : Model -> Position -> Board
+reverseDisk model pos =
+    let
+        myDisk =
+            playerToDisk model.currentPlayer
+    in
+    reverseDiskDirections model.board
+        myDisk
+        pos
+        (List.filter
+            (canPlaceDirection model pos)
+            allDirections
+        )
 
 
 updateCell : Position -> Model -> Board
 updateCell pos model =
-    case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
-        Just disk ->
-            Array2D.set (Tuple.first pos) (Tuple.second pos) (playerToDisk model.currentPlayer) model.board
+    let
+        model2 =
+            case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
+                Just disk ->
+                    { model
+                        | board =
+                            Array2D.set (Tuple.first pos) (Tuple.second pos) (playerToDisk model.currentPlayer) model.board
+                    }
 
-        Nothing ->
-            model.board
+                Nothing ->
+                    model
+    in
+    reverseDisk model2 pos
 
 
 updateState : Board -> GameState
@@ -346,16 +419,6 @@ updateState board =
             []
     in
     Active
-
-
-markForPlayer : Player -> Disk
-markForPlayer player =
-    case player of
-        PlayerBlack ->
-            1
-
-        PlayerWhite ->
-            -1
 
 
 updatePlayer : Player -> Player
