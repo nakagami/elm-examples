@@ -317,7 +317,7 @@ canPlace model pos =
         List.length
             (List.filter
                 (canPlaceDirection model pos)
-                [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ]
+                allDirections
             )
             > 0
 
