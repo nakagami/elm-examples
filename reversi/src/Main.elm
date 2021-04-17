@@ -138,19 +138,9 @@ makeRowHtml row =
             tr [] []
 
 
-makeCellHtml : PosDisk -> Html Position
+makeCellHtml : PosDisk -> Html Msg
 makeCellHtml cell =
-    td (cellAttributes cell) (cellTxt cell)
-
-
-cellAttributes : PosDisk -> List (Attribute Position)
-cellAttributes cell =
-    [ onClick cell.position ]
-
-
-cellTxt : PosDisk -> List (Html Position)
-cellTxt cell =
-    [ text <| diskToStr cell.disk ]
+    td [ onClick cell.position ] [ text <| diskToStr cell.disk ]
 
 
 stateStr : Model -> String
