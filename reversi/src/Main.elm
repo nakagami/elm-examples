@@ -124,11 +124,12 @@ filterByRow pos board =
     case Array2D.getRow pos (Array2D.indexedMap (\r c v -> PosDisk ( r, c ) v) board) of
         Just rowArray ->
             Array.toList rowArray
+
         Nothing ->
             []
 
 
-makeRowHtml :List PosDisk -> Html Position
+makeRowHtml : List PosDisk -> Html Position
 makeRowHtml row =
     tr [] (List.map makeCellHtml row)
 
@@ -223,14 +224,13 @@ css =
 update : Position -> Model -> Model
 update clkPos model =
     let
-        updatedBoard =
+        updatedModel =
             updateCell clkPos model
     in
     if canPlace model clkPos && model.gameState == Active then
-        { model
-            | board = updatedBoard
-            , currentPlayer = updatePlayer model.currentPlayer
-            , gameState = updateState updatedBoard
+        { updatedModel
+            | currentPlayer = updatePlayer updatedModel.currentPlayer
+            , gameState = updateState updatedModel
         }
 
     else
@@ -364,22 +364,25 @@ reverseDiskDirections board myDisk pos directions =
             updatedBoard
 
 
-reverseDisk : Model -> Position -> Board
-reverseDisk model pos =
+reverseDisk : Position -> Model -> Model
+reverseDisk pos model =
     let
         myDisk =
             playerToDisk model.currentPlayer
+
+        updatedBoard =
+            reverseDiskDirections model.board
+                myDisk
+                pos
+                (List.filter
+                    (canPlaceDirection model pos)
+                    allDirections
+                )
     in
-    reverseDiskDirections model.board
-        myDisk
-        pos
-        (List.filter
-            (canPlaceDirection model pos)
-            allDirections
-        )
+    { model | board = updatedBoard }
 
 
-updateCell : Position -> Model -> Board
+updateCell : Position -> Model -> Model
 updateCell pos model =
     let
         model2 =
@@ -393,11 +396,11 @@ updateCell pos model =
                 Nothing ->
                     model
     in
-    reverseDisk model2 pos
+    reverseDisk pos model2
 
 
-updateState : Board -> GameState
-updateState board =
+updateState : Model -> GameState
+updateState model =
     let
         -- TODO: Game over?
         posWins =
