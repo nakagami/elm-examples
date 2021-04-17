@@ -39,10 +39,6 @@ type alias PosDisk =
     { position : Position, disk : Disk }
 
 
-type alias Row =
-    Maybe (Array.Array PosDisk)
-
-
 type alias Board =
     Array2D.Array2D Disk
 
@@ -123,19 +119,18 @@ htmlFrom board =
         |> List.map makeRowHtml
 
 
-filterByRow : Int -> Board -> Row
+filterByRow : Int -> Board -> List PosDisk
 filterByRow pos board =
-    Array2D.getRow pos (Array2D.indexedMap (\r c v -> PosDisk ( r, c ) v) board)
-
-
-makeRowHtml : Row -> Html Position
-makeRowHtml row =
-    case row of
+    case Array2D.getRow pos (Array2D.indexedMap (\r c v -> PosDisk ( r, c ) v) board) of
         Just rowArray ->
-            tr [] (List.map makeCellHtml (Array.toList rowArray))
-
+            Array.toList rowArray
         Nothing ->
-            tr [] []
+            []
+
+
+makeRowHtml :List PosDisk -> Html Position
+makeRowHtml row =
+    tr [] (List.map makeCellHtml row)
 
 
 makeCellHtml : PosDisk -> Html Msg
