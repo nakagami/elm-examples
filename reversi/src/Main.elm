@@ -13,7 +13,7 @@ import Tuple
 
 main =
     Browser.sandbox
-        { init = init
+        { init = initModel
         , update = update
         , view = view
         }
@@ -27,16 +27,13 @@ type alias Position =
     ( Int, Int )
 
 
-
--- black: -1 white: 1 empty: 0
-
-
 type alias Disk =
+    -- black: -1 white: 1 empty: 0
     Int
 
 
 type alias PosDisk =
-    { position : Position, disk : Disk }
+    { pos : Position, disk : Disk }
 
 
 type alias Board =
@@ -69,8 +66,8 @@ type alias Msg =
 -- INIT
 
 
-init : Model
-init =
+initModel : Model
+initModel =
     { board = Array2D.fromList initBoard
     , currentPlayer = PlayerBlack
     , gameState = Active
@@ -129,14 +126,14 @@ filterByRow pos board =
             []
 
 
-makeRowHtml : List PosDisk -> Html Position
+makeRowHtml : List PosDisk -> Html Msg
 makeRowHtml row =
     tr [] (List.map makeCellHtml row)
 
 
 makeCellHtml : PosDisk -> Html Msg
 makeCellHtml cell =
-    td [ onClick cell.position ] [ text <| diskToStr cell.disk ]
+    td [ onClick cell.pos ] [ text <| diskToStr cell.disk ]
 
 
 stateStr : Model -> String
@@ -227,7 +224,7 @@ update clkPos model =
         updatedModel =
             updateCell clkPos model
     in
-    if canPlace model clkPos && model.gameState == Active then
+    if canPlacePos model clkPos && model.gameState == Active then
         { updatedModel
             | currentPlayer = updatePlayer updatedModel.currentPlayer
             , gameState = updateState updatedModel
@@ -242,13 +239,13 @@ update clkPos model =
 
 
 hasMyDisk : Model -> Position -> ( Int, Int ) -> Bool
-hasMyDisk model pos ( deltaX, deltaY ) =
+hasMyDisk model ( posX, posY ) ( deltaX, deltaY ) =
     let
         nextX =
-            Tuple.first pos + deltaX
+            posX + deltaX
 
         nextY =
-            Tuple.second pos + deltaY
+            posY + deltaY
     in
     case Array2D.get nextX nextY model.board of
         Just disk ->
@@ -266,13 +263,13 @@ hasMyDisk model pos ( deltaX, deltaY ) =
 
 
 canPlaceDirection : Model -> Position -> ( Int, Int ) -> Bool
-canPlaceDirection model pos ( deltaX, deltaY ) =
+canPlaceDirection model ( posX, posY ) ( deltaX, deltaY ) =
     let
         nextX =
-            Tuple.first pos + deltaX
+            posX + deltaX
 
         nextY =
-            Tuple.second pos + deltaY
+            posY + deltaY
     in
     case Array2D.get nextX nextY model.board of
         Just disk ->
@@ -290,11 +287,11 @@ canPlaceDirection model pos ( deltaX, deltaY ) =
 -- TODO: check other condistions
 
 
-canPlace : Model -> Position -> Bool
-canPlace model pos =
+canPlacePos : Model -> Position -> Bool
+canPlacePos model ( posX, posY ) =
     let
         isEmpty =
-            case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
+            case Array2D.get posX posY model.board of
                 Just disk ->
                     disk == 0
 
@@ -304,7 +301,7 @@ canPlace model pos =
     if isEmpty then
         List.length
             (List.filter
-                (canPlaceDirection model pos)
+                (canPlaceDirection model ( posX, posY ))
                 allDirections
             )
             > 0
@@ -318,13 +315,13 @@ canPlace model pos =
 
 
 reverseDiskDirection : Board -> Disk -> Position -> ( Int, Int ) -> Board
-reverseDiskDirection board myDisk pos ( deltaX, deltaY ) =
+reverseDiskDirection board myDisk ( posX, posY ) ( deltaX, deltaY ) =
     let
         nextX =
-            Tuple.first pos + deltaX
+            posX + deltaX
 
         nextY =
-            Tuple.second pos + deltaY
+            posY + deltaY
 
         canReverse =
             case Array2D.get nextX nextY board of
@@ -358,7 +355,7 @@ reverseDiskDirections board myDisk pos directions =
     in
     case List.tail directions of
         Just restDirections ->
-            reverseDiskDirections board myDisk pos restDirections
+            reverseDiskDirections updatedBoard myDisk pos restDirections
 
         Nothing ->
             updatedBoard
@@ -383,20 +380,20 @@ reverseDisk pos model =
 
 
 updateCell : Position -> Model -> Model
-updateCell pos model =
+updateCell ( posX, posY ) model =
     let
         model2 =
-            case Array2D.get (Tuple.first pos) (Tuple.second pos) model.board of
+            case Array2D.get posX posY model.board of
                 Just disk ->
                     { model
                         | board =
-                            Array2D.set (Tuple.first pos) (Tuple.second pos) (playerToDisk model.currentPlayer) model.board
+                            Array2D.set posX posY (playerToDisk model.currentPlayer) model.board
                     }
 
                 Nothing ->
                     model
     in
-    reverseDisk pos model2
+    reverseDisk ( posX, posY ) model2
 
 
 updateState : Model -> GameState
