@@ -293,18 +293,19 @@ canPlaceDirection model ( posX, posY ) ( deltaX, deltaY ) =
 -- TODO: check other condistions
 
 
+isEmpty : Model -> Position -> Bool
+isEmpty model ( posX, posY ) =
+    case Array2D.get posX posY model.board of
+        Just disk ->
+            disk == 0
+
+        Nothing ->
+            False
+
+
 canPlacePos : Model -> Position -> Bool
 canPlacePos model ( posX, posY ) =
-    let
-        isEmpty =
-            case Array2D.get posX posY model.board of
-                Just disk ->
-                    disk == 0
-
-                Nothing ->
-                    False
-    in
-    if isEmpty then
+    if isEmpty model ( posX, posY ) then
         List.length
             (List.filter
                 (canPlaceDirection model ( posX, posY ))
@@ -414,9 +415,20 @@ updateState model =
 
 updatePlayer : Model -> Player -> Player
 updatePlayer model player =
-    case player of
-        PlayerBlack ->
-            PlayerWhite
+    if
+        List.length
+            (List.filter
+                (canPlacePos model)
+                allPositions
+            )
+            > 0
+    then
+        case player of
+            PlayerBlack ->
+                PlayerWhite
 
-        PlayerWhite ->
-            PlayerBlack
+            PlayerWhite ->
+                PlayerBlack
+
+    else
+        player
