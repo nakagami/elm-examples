@@ -86,6 +86,12 @@ initBoard =
     ]
 
 
+allPositions : List Position
+allPositions =
+    List.concatMap (\r -> List.map (\c -> ( r, c )) (List.range 0 7)) (List.range 0 7)
+
+
+allDirections : List Position
 allDirections =
     [ ( -1, -1 ), ( -1, 0 ), ( -1, 1 ), ( 0, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -1 ), ( 0, -1 ) ]
 
@@ -226,7 +232,7 @@ update clkPos model =
     in
     if canPlacePos model clkPos && model.gameState == Active then
         { updatedModel
-            | currentPlayer = updatePlayer updatedModel.currentPlayer
+            | currentPlayer = updatePlayer model updatedModel.currentPlayer
             , gameState = updateState updatedModel
         }
 
@@ -406,8 +412,8 @@ updateState model =
     Active
 
 
-updatePlayer : Player -> Player
-updatePlayer player =
+updatePlayer : Model -> Player -> Player
+updatePlayer model player =
     case player of
         PlayerBlack ->
             PlayerWhite
