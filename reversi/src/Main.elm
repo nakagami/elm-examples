@@ -289,15 +289,11 @@ canPlaceDirection model ( posX, posY ) ( deltaX, deltaY ) =
             False
 
 
-
--- TODO: check other condistions
-
-
-isEmpty : Model -> Position -> Bool
-isEmpty model ( posX, posY ) =
+chkDisk : Model -> Disk -> Position -> Bool
+chkDisk model disk ( posX, posY ) =
     case Array2D.get posX posY model.board of
-        Just disk ->
-            disk == 0
+        Just posDisk ->
+            posDisk == disk
 
         Nothing ->
             False
@@ -305,7 +301,7 @@ isEmpty model ( posX, posY ) =
 
 canPlacePos : Model -> Position -> Bool
 canPlacePos model ( posX, posY ) =
-    if isEmpty model ( posX, posY ) then
+    if chkDisk model 0 ( posX, posY ) then
         List.length
             (List.filter
                 (canPlaceDirection model ( posX, posY ))
