@@ -402,11 +402,19 @@ updateCell ( posX, posY ) model =
 updateState : Model -> GameState
 updateState model =
     let
-        -- TODO: Game over?
-        posWins =
-            []
+        hasEmpty = List.length (List.filter (chkDisk model 0) allPositions) > 0
+        blackCount = List.length (List.filter (chkDisk model -1) allPositions)
+        whiteCount = List.length (List.filter (chkDisk model 1) allPositions)
     in
-    Active
+    if hasEmpty then
+        Active
+    else
+        if blackCount > whiteCount then
+            Won PlayerBlack
+        else if whiteCount > blackCount then
+            Won PlayerWhite
+        else
+            Tie
 
 
 updatePlayer : Model -> Player -> Player
