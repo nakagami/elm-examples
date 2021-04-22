@@ -230,7 +230,7 @@ update clkPos model =
         updatedModel =
             updateCell clkPos model
     in
-    if canPlacePos model clkPos && model.gameState == Active then
+    if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
         { updatedModel
             | currentPlayer = updatePlayer model updatedModel.currentPlayer
             , gameState = updateState updatedModel
@@ -244,8 +244,8 @@ update clkPos model =
 -- There is my disk in the direction of (deltaX, deltaY) from pos
 
 
-hasMyDisk : Model -> Position -> ( Int, Int ) -> Bool
-hasMyDisk model ( posX, posY ) ( deltaX, deltaY ) =
+hasSameDisk : Model -> Disk -> Position -> ( Int, Int ) -> Bool
+hasSameDisk model disk ( posX, posY ) ( deltaX, deltaY ) =
     let
         nextX =
             posX + deltaX
@@ -254,22 +254,22 @@ hasMyDisk model ( posX, posY ) ( deltaX, deltaY ) =
             posY + deltaY
     in
     case Array2D.get nextX nextY model.board of
-        Just disk ->
-            if disk == 0 then
+        Just nextPosDisk ->
+            if nextPosDisk == 0 then
                 False
 
-            else if disk == playerToDisk model.currentPlayer then
+            else if nextPosDisk == disk then
                 True
 
             else
-                hasMyDisk model ( nextX, nextY ) ( deltaX, deltaY )
+                hasSameDisk model disk ( nextX, nextY ) ( deltaX, deltaY )
 
         Nothing ->
             False
 
 
-canPlaceDirection : Model -> Position -> ( Int, Int ) -> Bool
-canPlaceDirection model ( posX, posY ) ( deltaX, deltaY ) =
+canPlaceDirection : Model -> Disk -> Position -> ( Int, Int ) -> Bool
+canPlaceDirection model disk ( posX, posY ) ( deltaX, deltaY ) =
     let
         nextX =
             posX + deltaX
@@ -278,12 +278,12 @@ canPlaceDirection model ( posX, posY ) ( deltaX, deltaY ) =
             posY + deltaY
     in
     case Array2D.get nextX nextY model.board of
-        Just disk ->
-            if disk == 0 || disk == playerToDisk model.currentPlayer then
+        Just nextPosDisk ->
+            if disk == 0 || nextPosDisk == disk then
                 False
 
             else
-                hasMyDisk model ( nextX, nextY ) ( deltaX, deltaY )
+                hasSameDisk model disk ( nextX, nextY ) ( deltaX, deltaY )
 
         Nothing ->
             False
@@ -299,12 +299,12 @@ chkDisk model disk ( posX, posY ) =
             False
 
 
-canPlacePos : Model -> Position -> Bool
-canPlacePos model ( posX, posY ) =
+canPlacePos : Model -> Disk -> Position -> Bool
+canPlacePos model disk ( posX, posY ) =
     if chkDisk model 0 ( posX, posY ) then
         List.length
             (List.filter
-                (canPlaceDirection model ( posX, posY ))
+                (canPlaceDirection model disk ( posX, posY ))
                 allDirections
             )
             > 0
@@ -375,7 +375,7 @@ reverseDisk pos model =
                 myDisk
                 pos
                 (List.filter
-                    (canPlaceDirection model pos)
+                    (canPlaceDirection model myDisk pos)
                     allDirections
                 )
     in
@@ -402,27 +402,38 @@ updateCell ( posX, posY ) model =
 updateState : Model -> GameState
 updateState model =
     let
-        hasEmpty = List.length (List.filter (chkDisk model 0) allPositions) > 0
-        blackCount = List.length (List.filter (chkDisk model -1) allPositions)
-        whiteCount = List.length (List.filter (chkDisk model 1) allPositions)
+        hasEmpty =
+            List.length (List.filter (chkDisk model 0) allPositions) > 0
+
+        blackCount =
+            List.length (List.filter (chkDisk model -1) allPositions)
+
+        whiteCount =
+            List.length (List.filter (chkDisk model 1) allPositions)
     in
     if hasEmpty then
         Active
+
+    else if blackCount > whiteCount then
+        Won PlayerBlack
+
+    else if whiteCount > blackCount then
+        Won PlayerWhite
+
     else
-        if blackCount > whiteCount then
-            Won PlayerBlack
-        else if whiteCount > blackCount then
-            Won PlayerWhite
-        else
-            Tie
+        Tie
 
 
 updatePlayer : Model -> Player -> Player
 updatePlayer model player =
+    let
+        myDisk =
+            playerToDisk model.currentPlayer
+    in
     if
         List.length
             (List.filter
-                (canPlacePos model)
+                (canPlacePos model (myDisk * -1))
                 allPositions
             )
             > 0
