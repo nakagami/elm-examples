@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (..)
 
 -- https://github.com/nakagami/elm-examples/tree/master/reversi
 
