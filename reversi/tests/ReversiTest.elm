@@ -14,8 +14,30 @@ testModel1 =
     , gameState = Active
     }
 
+
+testBoard2 =
+    [ [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, -1, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, -1, -1, 0, 0, 0 ]
+    , [ 0, 0, 1, 1, 1, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    ]
+
+
+testModel2 : Model
+testModel2 =
+    { board = Array2D.fromList testBoard2
+    , currentPlayer = PlayerBlack
+    , gameState = Active
+    }
+
+
 blackDisk : Disk
-blackDisk = playerToDisk PlayerBlack
+blackDisk =
+    playerToDisk PlayerBlack
 
 
 suite : Test
@@ -23,10 +45,14 @@ suite =
     describe "Reversi"
         [ test "canPlacePos1 " <|
             \_ ->
-                canPlacePos testModel1 blackDisk (4, 5)
+                canPlacePos testModel1 blackDisk ( 4, 5 )
                     |> Expect.equal True
         , test "canPlacePos2 " <|
             \_ ->
-                canPlacePos testModel1 blackDisk (5, 3)
+                canPlacePos testModel1 blackDisk ( 5, 3 )
+                    |> Expect.equal False
+        , test "canPlacePos3 " <|
+            \_ ->
+                canPlacePos testModel2 blackDisk ( 4, 1 )
                     |> Expect.equal False
         ]
