@@ -43,16 +43,20 @@ blackDisk =
 suite : Test
 suite =
     describe "Reversi"
-        [ test "canPlacePos1 " <|
+        [ test "canPlacePos1" <|
             \_ ->
                 canPlacePos testModel1 blackDisk ( 4, 5 )
                     |> Expect.equal True
-        , test "canPlacePos2 " <|
+        , test "canPlacePos2" <|
             \_ ->
                 canPlacePos testModel1 blackDisk ( 5, 3 )
                     |> Expect.equal False
-        , test "canPlacePos3 " <|
+        , test "canPlacePos3" <|
             \_ ->
                 canPlacePos testModel2 blackDisk ( 4, 1 )
                     |> Expect.equal False
+        , test "findBestPos" <|
+            \_ ->
+                findBestPos testModel2
+                    |> Expect.equal (5, 5)
         ]
