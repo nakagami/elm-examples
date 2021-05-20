@@ -5,6 +5,7 @@ module Main exposing (..)
 import Array
 import Array2D
 import Browser
+import Dict
 import Html exposing (Attribute, Html, caption, div, table, tbody, td, text, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -66,6 +67,10 @@ type alias Msg =
 -- NPC
 
 
+npcPlayer =
+    PlayerWhite
+
+
 npcMatrix =
     Array2D.fromList
         [ [ 30, -12, 0, -1, -1, 0, -12, 30 ]
@@ -79,14 +84,38 @@ npcMatrix =
         ]
 
 
-calcScore : Model -> Disk -> Position -> Int
-calcScore model disk ( posX, posY ) =
-    -- TODO:
-    0
+getWeight : Position -> Int
+getWeight ( posX, posY ) =
+    case Array2D.get posX posY npcMatrix of
+        Just weight ->
+            weight
+
+        Nothing ->
+            0
 
 
+calcScore : Model -> Position -> ( Int, Position )
+calcScore model pos =
+    let
+        updatedModel =
+            updateCell pos model
 
--- findBestPos =
+        myDisk =
+            playerToDisk model.currentPlayer
+
+        myScore =
+            allPositions
+                |> List.filter (chkDisk model myDisk)
+                |> List.map getWeight
+                |> List.sum
+
+        opponentScore =
+            allPositions
+                |> List.filter (chkDisk model (myDisk * -1))
+                |> List.map getWeight
+                |> List.sum
+    in
+    ( myScore - opponentScore, pos )
 
 
 findBestPos : Model -> Position
@@ -94,9 +123,21 @@ findBestPos model =
     let
         myDisk =
             playerToDisk model.currentPlayer
+
+        scorePosList =
+            allPositions
+                |> List.filter (canPlacePos model myDisk)
+                |> List.map (calcScore model)
+
+        maxScore =
+            scorePosList
+                |> List.map Tuple.first
+                |> List.maximum
+                |> Maybe.withDefault -9999999
     in
-    -- TODO:
-    ( 0, 0 )
+    Dict.fromList scorePosList
+        |> Dict.get maxScore
+        |> Maybe.withDefault ( -1, -1 )
 
 
 
@@ -262,20 +303,43 @@ css =
 -- UPDATE
 
 
+updateNpc : Model -> Model
+updateNpc model =
+    let
+        pos =
+            findBestPos model
+
+        updatedModel =
+            updateCell pos model
+    in
+    { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
+
+
+updateIfNpc : Model -> Model
+updateIfNpc model =
+    if model.currentPlayer == npcPlayer && model.gameState == Active then
+        updateNpc model
+
+    else
+        model
+
+
 update : Position -> Model -> Model
 update clkPos model =
     let
         updatedModel =
             updateCell clkPos model
     in
-    if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
-        { updatedModel
-            | currentPlayer = updatePlayer model updatedModel.currentPlayer
-            , gameState = updateState updatedModel
-        }
+    updateIfNpc
+        (if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
+            { updatedModel
+                | currentPlayer = updatePlayer model updatedModel.currentPlayer
+                , gameState = updateState updatedModel
+            }
 
-    else
-        model
+         else
+            model
+        )
 
 
 
