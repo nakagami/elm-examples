@@ -66,6 +66,7 @@ type alias Msg =
 
 -- NPC
 
+npcPlayer = PlayerWhite
 
 npcMatrix =
     Array2D.fromList
