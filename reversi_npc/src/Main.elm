@@ -66,7 +66,10 @@ type alias Msg =
 
 -- NPC
 
-npcPlayer = PlayerWhite
+
+npcPlayer =
+    PlayerWhite
+
 
 npcMatrix =
     Array2D.fromList
@@ -300,20 +303,43 @@ css =
 -- UPDATE
 
 
+updateNpc : Model -> Model
+updateNpc model =
+    let
+        pos =
+            findBestPos model
+
+        updatedModel =
+            updateCell pos model
+    in
+    { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
+
+
+updateIfNpc : Model -> Model
+updateIfNpc model =
+    if model.currentPlayer == npcPlayer && model.gameState == Active then
+        updateNpc model
+
+    else
+        model
+
+
 update : Position -> Model -> Model
 update clkPos model =
     let
         updatedModel =
             updateCell clkPos model
     in
-    if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
-        { updatedModel
-            | currentPlayer = updatePlayer model updatedModel.currentPlayer
-            , gameState = updateState updatedModel
-        }
+    updateIfNpc
+        (if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
+            { updatedModel
+                | currentPlayer = updatePlayer model updatedModel.currentPlayer
+                , gameState = updateState updatedModel
+            }
 
-    else
-        model
+         else
+            model
+        )
 
 
 
