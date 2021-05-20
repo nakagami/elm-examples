@@ -68,22 +68,23 @@ type alias Msg =
 
 initModel : Model
 initModel =
-    { board = Array2D.fromList initBoard
+    { board = initBoard
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
 
 
 initBoard =
-    [ [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    , [ 0, 0, 0, 1, -1, 0, 0, 0 ]
-    , [ 0, 0, 0, -1, 1, 0, 0, 0 ]
-    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
-    ]
+    Array2D.fromList
+        [ [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+        , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+        , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+        , [ 0, 0, 0, 1, -1, 0, 0, 0 ]
+        , [ 0, 0, 0, -1, 1, 0, 0, 0 ]
+        , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+        , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+        , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+        ]
 
 
 allPositions : List Position
