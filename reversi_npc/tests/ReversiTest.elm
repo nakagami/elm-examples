@@ -9,7 +9,7 @@ import Test exposing (..)
 
 testModel1 : Model
 testModel1 =
-    { board = Array2D.fromList initBoard
+    { board = initBoard
     , currentPlayer = PlayerBlack
     , gameState = Active
     }
