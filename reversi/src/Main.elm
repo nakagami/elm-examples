@@ -241,19 +241,19 @@ update clkPos model =
 
 
 
--- There is my disk in the direction of (deltaX, deltaY) from pos
+-- There is my disk in the direction of (deltaY, deltaX) from pos
 
 
 hasSameDisk : Model -> Disk -> Position -> ( Int, Int ) -> Bool
-hasSameDisk model disk ( posX, posY ) ( deltaX, deltaY ) =
+hasSameDisk model disk ( posY, posX ) ( deltaY, deltaX ) =
     let
-        nextX =
-            posX + deltaX
-
         nextY =
             posY + deltaY
+
+        nextX =
+            posX + deltaX
     in
-    case Array2D.get nextX nextY model.board of
+    case Array2D.get nextY nextX model.board of
         Just nextPosDisk ->
             if nextPosDisk == 0 then
                 False
@@ -262,36 +262,36 @@ hasSameDisk model disk ( posX, posY ) ( deltaX, deltaY ) =
                 True
 
             else
-                hasSameDisk model disk ( nextX, nextY ) ( deltaX, deltaY )
+                hasSameDisk model disk ( nextY, nextX ) ( deltaY, deltaX )
 
         Nothing ->
             False
 
 
 canPlaceDirection : Model -> Disk -> Position -> ( Int, Int ) -> Bool
-canPlaceDirection model disk ( posX, posY ) ( deltaX, deltaY ) =
+canPlaceDirection model disk ( posY, posX ) ( deltaY, deltaX ) =
     let
-        nextX =
-            posX + deltaX
-
         nextY =
             posY + deltaY
+
+        nextX =
+            posX + deltaX
     in
-    case Array2D.get nextX nextY model.board of
+    case Array2D.get nextY nextX model.board of
         Just nextPosDisk ->
-            if disk == 0 || nextPosDisk == disk then
+            if nextPosDisk == 0 || nextPosDisk == disk then
                 False
 
             else
-                hasSameDisk model disk ( nextX, nextY ) ( deltaX, deltaY )
+                hasSameDisk model disk ( nextY, nextX ) ( deltaY, deltaX )
 
         Nothing ->
             False
 
 
 chkDisk : Model -> Disk -> Position -> Bool
-chkDisk model disk ( posX, posY ) =
-    case Array2D.get posX posY model.board of
+chkDisk model disk ( posY, posX ) =
+    case Array2D.get posY posX model.board of
         Just posDisk ->
             posDisk == disk
 
@@ -300,11 +300,11 @@ chkDisk model disk ( posX, posY ) =
 
 
 canPlacePos : Model -> Disk -> Position -> Bool
-canPlacePos model disk ( posX, posY ) =
-    if chkDisk model 0 ( posX, posY ) then
+canPlacePos model disk ( posY, posX ) =
+    if chkDisk model 0 ( posY, posX ) then
         List.length
             (List.filter
-                (canPlaceDirection model disk ( posX, posY ))
+                (canPlaceDirection model disk ( posY, posX ))
                 allDirections
             )
             > 0
@@ -318,16 +318,16 @@ canPlacePos model disk ( posX, posY ) =
 
 
 reverseDiskDirection : Board -> Disk -> Position -> ( Int, Int ) -> Board
-reverseDiskDirection board myDisk ( posX, posY ) ( deltaX, deltaY ) =
+reverseDiskDirection board myDisk ( posY, posX ) ( deltaY, deltaX ) =
     let
-        nextX =
-            posX + deltaX
-
         nextY =
             posY + deltaY
 
+        nextX =
+            posX + deltaX
+
         canReverse =
-            case Array2D.get nextX nextY board of
+            case Array2D.get nextY nextX board of
                 Just disk ->
                     disk == myDisk * -1
 
@@ -338,8 +338,8 @@ reverseDiskDirection board myDisk ( posX, posY ) ( deltaX, deltaY ) =
         reverseDiskDirection
             (Array2D.set nextX nextY myDisk board)
             myDisk
-            ( nextX, nextY )
-            ( deltaX, deltaY )
+            ( nextY, nextX )
+            ( deltaY, deltaX )
 
     else
         board
@@ -383,20 +383,20 @@ reverseDisk pos model =
 
 
 updateCell : Position -> Model -> Model
-updateCell ( posX, posY ) model =
+updateCell ( posY, posX ) model =
     let
         model2 =
-            case Array2D.get posX posY model.board of
+            case Array2D.get posY posX model.board of
                 Just disk ->
                     { model
                         | board =
-                            Array2D.set posX posY (playerToDisk model.currentPlayer) model.board
+                            Array2D.set posY posX (playerToDisk model.currentPlayer) model.board
                     }
 
                 Nothing ->
                     model
     in
-    reverseDisk ( posX, posY ) model2
+    reverseDisk ( posY, posX ) model2
 
 
 updateState : Model -> GameState
