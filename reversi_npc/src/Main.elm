@@ -79,24 +79,57 @@ npcMatrix =
         ]
 
 
-calcScore : Model -> Disk -> Position -> Int
-calcScore model disk ( posX, posY ) =
-    -- TODO:
-    0
+getWeight : Position -> Int
+getWeight ( posX, posY ) =
+    case Array2D.get posX posY npcMatrix of
+        Just weight ->
+            weight
+
+        Nothing ->
+            0
 
 
+calcScore : Model -> Position -> Int
+calcScore model pos =
+    let
+        updatedModel =
+            updateCell pos model
 
--- findBestPos =
+        myDisk =
+            playerToDisk model.currentPlayer
+
+        myScore =
+            allPositions
+                |> List.filter (chkDisk model myDisk)
+                |> List.map getWeight
+                |> List.sum
+
+        opponentScore =
+            allPositions
+                |> List.filter (chkDisk model (myDisk * -1))
+                |> List.map getWeight
+                |> List.sum
+    in
+    myScore - opponentScore
 
 
-findBestPos : Model -> Position
+findBestPos : Model -> List Position
 findBestPos model =
+    -- TODO: 最適な場所を探す
+    -- 1. おける場所のリストを作る
+    -- 2. 指定位置のスコアを calcScore で取得
+    -- 3. 最大を取得
+    -- Dict を使う気がする https://package.elm-lang.org/packages/elm/core/latest/Dict
     let
         myDisk =
             playerToDisk model.currentPlayer
+
+        myPos =
+            List.filter
+                (canPlacePos model myDisk)
+                allPositions
     in
-    -- TODO:
-    ( 0, 0 )
+    [ ( 0, 0 ) ]
 
 
 
