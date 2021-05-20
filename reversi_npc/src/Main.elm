@@ -5,6 +5,7 @@ module Main exposing (..)
 import Array
 import Array2D
 import Browser
+import Dict
 import Html exposing (Attribute, Html, caption, div, table, tbody, td, text, tr)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -89,7 +90,7 @@ getWeight ( posX, posY ) =
             0
 
 
-calcScore : Model -> Position -> Int
+calcScore : Model -> Position -> ( Int, Position )
 calcScore model pos =
     let
         updatedModel =
@@ -110,26 +111,29 @@ calcScore model pos =
                 |> List.map getWeight
                 |> List.sum
     in
-    myScore - opponentScore
+    ( myScore - opponentScore, pos )
 
 
-findBestPos : Model -> List Position
+findBestPos : Model -> Position
 findBestPos model =
-    -- TODO: 最適な場所を探す
-    -- 1. おける場所のリストを作る
-    -- 2. 指定位置のスコアを calcScore で取得
-    -- 3. 最大を取得
-    -- Dict を使う気がする https://package.elm-lang.org/packages/elm/core/latest/Dict
     let
         myDisk =
             playerToDisk model.currentPlayer
 
-        myPos =
-            List.filter
-                (canPlacePos model myDisk)
-                allPositions
+        scorePosList =
+            allPositions
+                |> List.filter (canPlacePos model myDisk)
+                |> List.map (calcScore model)
+
+        maxScore =
+            scorePosList
+                |> List.map Tuple.first
+                |> List.maximum
+                |> Maybe.withDefault -9999999
     in
-    [ ( 0, 0 ) ]
+    Dict.fromList scorePosList
+        |> Dict.get maxScore
+        |> Maybe.withDefault ( -1, -1 )
 
 
 
