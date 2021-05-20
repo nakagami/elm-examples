@@ -1,6 +1,6 @@
 module Main exposing (..)
 
--- https://github.com/nakagami/elm-examples/tree/master/reversi
+-- https://github.com/nakagami/elm-examples/tree/master/reversi_npc
 
 import Array
 import Array2D
@@ -61,6 +61,18 @@ type alias Model =
 type alias Msg =
     Position
 
+-- NPC
+
+npcMatrix =
+    [ [30, -12, 0, -1, -1, 0, -12, 30]
+    , [-12, -15, -3, -3, -3, -3, -15, -12]
+    , [0, -3, 0, -1, -1, 0, -3, 0]
+    , [-1, -3, -1, -1, -1, -1, -3, -1]
+    , [-1, -3, -1, -1, -1, -1, -3, -1]
+    , [0, -3, 0, -1, -1, 0, -3, 0]
+    , [-12, -15, -3, -3, -3, -3, -15, -12]
+    , [30, -12, 0, -1, -1, 0, -12, 30]
+    ]
 
 
 -- INIT
