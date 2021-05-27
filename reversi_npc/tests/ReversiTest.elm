@@ -35,6 +35,26 @@ testModel2 =
     }
 
 
+testBoard3 =
+    [ [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, -1, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, -1, -1, 0, 0, 0 ]
+    , [ 0, 0, 0, -1, 1, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , [ 0, 0, 0, 0, 0, 0, 0, 0 ]
+    ]
+
+
+testModel3 : Model
+testModel3 =
+    { board = Array2D.fromList testBoard3
+    , currentPlayer = PlayerWhite
+    , gameState = Active
+    }
+
+
 blackDisk : Disk
 blackDisk =
     playerToDisk PlayerBlack
@@ -55,4 +75,8 @@ suite =
             \_ ->
                 canPlacePos testModel2 blackDisk ( 4, 1 )
                     |> Expect.equal False
+        , test "findBestPos " <|
+            \_ ->
+                findBestPos testModel3
+                    |> Expect.equal ( 2, 2 )
         ]
