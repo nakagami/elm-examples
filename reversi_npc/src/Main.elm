@@ -105,13 +105,13 @@ calcScore model pos =
 
         myScore =
             allPositions
-                |> List.filter (chkDisk model myDisk)
+                |> List.filter (chkDisk updatedModel myDisk)
                 |> List.map getWeight
                 |> List.sum
 
         opponentScore =
             allPositions
-                |> List.filter (chkDisk model (myDisk * -1))
+                |> List.filter (chkDisk updatedModel (myDisk * -1))
                 |> List.map getWeight
                 |> List.sum
     in
