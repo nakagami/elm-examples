@@ -305,20 +305,15 @@ css =
 
 updateNpc : Model -> Model
 updateNpc model =
-    let
-        pos =
-            findBestPos model
-
-        updatedModel =
-            updateCell pos model
-    in
-    { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
-
-
-updateIfNpc : Model -> Model
-updateIfNpc model =
     if model.currentPlayer == npcPlayer && model.gameState == Active then
-        updateNpc model
+        let
+            pos =
+                findBestPos model
+
+            updatedModel =
+                updateCell pos model
+        in
+        { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
 
     else
         model
@@ -330,7 +325,7 @@ update clkPos model =
         updatedModel =
             updateCell clkPos model
     in
-    updateIfNpc
+    updateNpc
         (if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
             { updatedModel
                 | currentPlayer = updatePlayer model updatedModel.currentPlayer
