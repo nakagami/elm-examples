@@ -318,7 +318,6 @@ updateNpc model =
 
         else
             model
-
     else
         model
 
@@ -523,6 +522,31 @@ updateState model =
 
     else
         Tie
+
+
+switchPlayer : Model -> Model
+switchPlayer model =
+    let
+        myDisk =
+            playerToDisk model.currentPlayer
+    in
+    if
+        List.length
+            (List.filter
+                (canPlacePos model (myDisk * -1))
+                allPositions
+            )
+            > 0
+    then
+        case model.currentPlayer of
+            PlayerBlack ->
+                { model | currentPlayer = PlayerWhite }
+
+            PlayerWhite ->
+                { model | currentPlayer = PlayerBlack }
+
+    else
+        model
 
 
 updatePlayer : Model -> Player -> Player
