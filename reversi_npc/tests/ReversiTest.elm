@@ -78,5 +78,5 @@ suite =
         , test "findBestPos " <|
             \_ ->
                 findBestPos testModel3
-                    |> Expect.equal ( 2, 2 )
+                    |> Expect.equal (Just ( 2, 2 ))
         ]

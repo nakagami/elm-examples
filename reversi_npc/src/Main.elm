@@ -118,7 +118,7 @@ calcScore model pos =
     ( myScore - opponentScore, pos )
 
 
-findBestPos : Model -> Position
+findBestPos : Model -> Maybe Position
 findBestPos model =
     let
         myDisk =
@@ -137,7 +137,6 @@ findBestPos model =
     in
     Dict.fromList scorePosList
         |> Dict.get maxScore
-        |> Maybe.withDefault ( -1, -1 )
 
 
 
@@ -305,19 +304,17 @@ css =
 
 updateNpc : Model -> Model
 updateNpc model =
-    if model.gameState == Active then
-        if model.currentPlayer == npcPlayer then
-            let
-                pos =
-                    findBestPos model
+    if model.gameState == Active && model.currentPlayer == npcPlayer then
+        case findBestPos model of
+            Just pos ->
+                model
+                    |> updateCell pos
+                    |> switchPlayer
 
-                updatedModel =
-                    updateCell pos model
-            in
-            { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
+            Nothing ->
+                model
+                    |> switchPlayer
 
-        else
-            model
     else
         model
 
