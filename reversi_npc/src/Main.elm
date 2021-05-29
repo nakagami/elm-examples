@@ -305,15 +305,19 @@ css =
 
 updateNpc : Model -> Model
 updateNpc model =
-    if model.currentPlayer == npcPlayer && model.gameState == Active then
-        let
-            pos =
-                findBestPos model
+    if model.gameState == Active then
+        if model.currentPlayer == npcPlayer then
+            let
+                pos =
+                    findBestPos model
 
-            updatedModel =
-                updateCell pos model
-        in
-        { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
+                updatedModel =
+                    updateCell pos model
+            in
+            { updatedModel | currentPlayer = updatePlayer model updatedModel.currentPlayer }
+
+        else
+            model
 
     else
         model
