@@ -302,6 +302,17 @@ css =
 -- UPDATE
 
 
+updatePlayer : Position -> Model -> Model
+updatePlayer clkPos model =
+    if model.gameState == Active && model.currentPlayer /= npcPlayer && canPlacePos model (playerToDisk model.currentPlayer) clkPos then
+        model
+            |> updateCell clkPos
+            |> switchPlayer
+
+    else
+        model
+
+
 updateNpc : Model -> Model
 updateNpc model =
     if model.gameState == Active && model.currentPlayer == npcPlayer then
@@ -321,20 +332,10 @@ updateNpc model =
 
 update : Position -> Model -> Model
 update clkPos model =
-    let
-        updatedModel =
-            updateCell clkPos model
-    in
-    updateNpc
-        (if canPlacePos model (playerToDisk model.currentPlayer) clkPos && model.gameState == Active then
-            { updatedModel
-                | currentPlayer = updatePlayer model updatedModel.currentPlayer
-                , gameState = updateState updatedModel
-            }
-
-         else
-            model
-        )
+    model
+        |> updatePlayer clkPos
+        |> updateNpc
+        |> updateState
 
 
 
@@ -496,7 +497,7 @@ updateCell ( posX, posY ) model =
     reverseDisk ( posX, posY ) model2
 
 
-updateState : Model -> GameState
+updateState : Model -> Model
 updateState model =
     let
         hasEmpty =
@@ -508,29 +509,28 @@ updateState model =
         whiteCount =
             List.length (List.filter (chkDisk model 1) allPositions)
     in
-    if hasEmpty then
-        Active
+    { model
+        | gameState =
+            if hasEmpty then
+                Active
 
-    else if blackCount > whiteCount then
-        Won PlayerBlack
+            else if blackCount > whiteCount then
+                Won PlayerBlack
 
-    else if whiteCount > blackCount then
-        Won PlayerWhite
+            else if whiteCount > blackCount then
+                Won PlayerWhite
 
-    else
-        Tie
+            else
+                Tie
+    }
 
 
 switchPlayer : Model -> Model
 switchPlayer model =
-    let
-        myDisk =
-            playerToDisk model.currentPlayer
-    in
     if
         List.length
             (List.filter
-                (canPlacePos model (myDisk * -1))
+                (canPlacePos model (playerToDisk model.currentPlayer * -1))
                 allPositions
             )
             > 0
@@ -544,28 +544,3 @@ switchPlayer model =
 
     else
         model
-
-
-updatePlayer : Model -> Player -> Player
-updatePlayer model player =
-    let
-        myDisk =
-            playerToDisk model.currentPlayer
-    in
-    if
-        List.length
-            (List.filter
-                (canPlacePos model (myDisk * -1))
-                allPositions
-            )
-            > 0
-    then
-        case player of
-            PlayerBlack ->
-                PlayerWhite
-
-            PlayerWhite ->
-                PlayerBlack
-
-    else
-        player
