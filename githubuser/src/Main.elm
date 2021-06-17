@@ -1,12 +1,13 @@
 module Main exposing (..)
 
--- https://github.com/nakagami/elm-examples/tree/master/githubzen
+-- https://github.com/nakagami/elm-examples/tree/master/githubuser
 
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import Json.Decode exposing (Decoder)
 
 
 
@@ -26,15 +27,30 @@ main =
 -- MODEL
 
 
+type alias User =
+    { id : Int
+    , login : String
+    , name : String
+    }
+
+
+userDecoder : Decoder User
+userDecoder =
+    Json.Decode.map3 User
+        (Json.Decode.field "id" Json.Decode.int)
+        (Json.Decode.field "login" Json.Decode.string)
+        (Json.Decode.field "name" Json.Decode.string)
+
+
 type Model
     = Failure
     | Loading
-    | Success String
+    | Success User
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Loading, getGithubZen )
+    ( Loading, getGithubUser )
 
 
 
@@ -43,19 +59,19 @@ init _ =
 
 type Msg
     = MorePlease
-    | GotZen (Result Http.Error String)
+    | GotUser (Result Http.Error User)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         MorePlease ->
-            ( Loading, getGithubZen )
+            ( Loading, getGithubUser )
 
-        GotZen result ->
+        GotUser result ->
             case result of
-                Ok principle ->
-                    ( Success principle, Cmd.none )
+                Ok user ->
+                    ( Success user, Cmd.none )
 
                 Err _ ->
                     ( Failure, Cmd.none )
@@ -77,27 +93,28 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h2 [] [ text "Github Zen" ]
-        , viewZen model
+        [ h2 [] [ text "Github User" ]
+        , viewUser model
         ]
 
 
-viewZen : Model -> Html Msg
-viewZen model =
+viewUser : Model -> Html Msg
+viewUser model =
     case model of
         Failure ->
             div []
-                [ text "I could not load a random cat for some reason. "
+                [ text "I could not load . "
                 , button [ onClick MorePlease ] [ text "Try Again!" ]
                 ]
 
         Loading ->
             text "Loading..."
 
-        Success principle ->
+        Success user ->
             div []
-                [ button [ onClick MorePlease, style "display" "block" ] [ text "More Please!" ]
-                , text principle
+                [ button [ onClick MorePlease, style "display" "block" ] [ text "Get user info !" ]
+                , text user.login
+                , text user.name
                 ]
 
 
@@ -105,9 +122,9 @@ viewZen model =
 -- HTTP
 
 
-getGithubZen : Cmd Msg
-getGithubZen =
+getGithubUser : Cmd Msg
+getGithubUser =
     Http.get
         { url = "https://api.github.com/users/nakagami"
-        , expect = Http.expectString GotZen
+        , expect = Http.expectJson GotUser userDecoder
         }
