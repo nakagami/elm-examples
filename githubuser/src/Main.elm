@@ -113,8 +113,10 @@ viewUser model =
         Success user ->
             div []
                 [ button [ onClick MorePlease, style "display" "block" ] [ text "Get user info !" ]
-                , text user.login
-                , text user.name
+                , ul []
+                    [ li [] [ text user.login ]
+                    , li [] [ text user.name ]
+                    ]
                 ]
 
 
