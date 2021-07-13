@@ -1,4 +1,4 @@
-module Main exposing(main)
+module FirstElm exposing(main)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
