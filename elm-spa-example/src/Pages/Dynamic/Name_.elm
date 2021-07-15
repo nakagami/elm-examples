@@ -8,12 +8,18 @@ import View exposing (View)
 
 
 page : Shared.Model -> Request.With Params -> Page
-page shared req =
+page _ req =
     Page.static
-        { view = view
+        { view = view req.params
         }
 
 
-view : View msg
-view =
-    View.placeholder "Dynamic.Name_"
+view : Params -> View msg
+view params =
+    { title = "Dynamic: " ++ params.name
+    , body =
+        UI.layout
+            [ UI.h1 "Dynamic Page"
+            , Html.h2 [] [ Html.text params.name ]
+            ]
+    }
