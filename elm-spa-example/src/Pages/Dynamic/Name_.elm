@@ -1,5 +1,7 @@
 module Pages.Dynamic.Name_ exposing (page)
 
+import Html
+import UI
 import Gen.Params.Dynamic.Name_ exposing (Params)
 import Page exposing (Page)
 import Request

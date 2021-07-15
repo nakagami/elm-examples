@@ -1,9 +1,9 @@
-module UI exposing (layout)
+module UI exposing (h1, layout)
 
-import Html exposing (Html)
+import Html exposing (..)
 import Html.Attributes as Attr
 
-import Gen.Route as Route
+import Gen.Route as Route exposing (Route)
 
 layout : List (Html msg) -> List (Html msg)
 layout children =
@@ -26,3 +26,7 @@ layout children =
         , Html.main_ [] children
         ]
     ]
+
+h1 : String -> Html msg
+h1 label =
+    Html.h1 [] [ Html.text label ]
